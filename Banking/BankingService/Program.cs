@@ -41,7 +41,12 @@ namespace BankingService
 
         static void OpenAccountSector()
         {
-
+            while (true)
+            {
+                lock (Database.accountsRequests)
+                {
+                }
+            }
         }
     }
 }
