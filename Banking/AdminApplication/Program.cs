@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
+using System.Security.Principal;
 using System.ServiceModel;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using Common.Certifications;
 
 namespace AdminApplication
 {
@@ -11,10 +15,28 @@ namespace AdminApplication
     {
         static void Main(string[] args)
         {
-            NetTcpBinding binding = new NetTcpBinding();
-            string address = "net.tcp://localhost:25000/AdminServices";
+            Thread.CurrentPrincipal = new WindowsPrincipal(WindowsIdentity.GetCurrent());
 
-            using (AdminProxy proxy = new AdminProxy(binding, new EndpointAddress(new Uri(address))))
+            if (!Thread.CurrentPrincipal.IsInRole(Formatter.FormatName("BankingSystemAdmin")))
+            {
+                Console.WriteLine("You don't have permission to use this component.");
+                Console.WriteLine("Press any key to exit...");
+                Console.ReadKey(true);
+
+                return;
+            }
+
+
+            string srvCertCN = "BankingService";
+
+            NetTcpBinding binding = new NetTcpBinding();
+            binding.Security.Mode = SecurityMode.Message;
+            binding.Security.Message.ClientCredentialType = MessageCredentialType.Certificate;
+            X509Certificate2 srvCert = CertManager.GetCertificateFromStorage(StoreName.TrustedPeople, StoreLocation.LocalMachine, srvCertCN);
+            EndpointAddress address = new EndpointAddress(new Uri("net.tcp://localhost:25000/AdminServices"),
+                new X509CertificateEndpointIdentity(srvCert));
+
+            using (AdminProxy proxy = new AdminProxy(binding, address))
             {
                 proxy.Init();
                 proxy.CheckRequest();

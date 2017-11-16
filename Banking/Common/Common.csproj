@@ -45,6 +45,7 @@
   <ItemGroup>
     <Compile Include="Account.cs" />
     <Compile Include="Certifications\CertManager.cs" />
+    <Compile Include="Certifications\ClientCertValidator.cs" />
     <Compile Include="Certifications\Formatter.cs" />
     <Compile Include="Certifications\ServiceCertValidator.cs" />
     <Compile Include="Database.cs" />

@@ -27,5 +27,10 @@ namespace Common.Certifications
                 return winLogonName;
             }
         }
+
+        public static string FormatName(string name)
+        {
+            return $"{Environment.MachineName}\\{name}";
+        }
     }
 }
