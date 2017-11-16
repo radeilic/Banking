@@ -9,20 +9,20 @@ namespace Common
 {
     public class UserServices : IUserServices
     {
-        public bool OpenAccount()
+        public bool OpenAccount(string accountName)
         {
             Console.WriteLine("OpenAccount called.");
             return true;
         }
 
-        public bool Payment()
+        public bool Payment(bool isPayment, string accountName, int amount)
         {
             Console.WriteLine("Payment called.");
             return true;
 
         }
 
-        public bool RaiseALoan()
+        public bool RaiseALoan(string accountName, int amount)
         {
             Console.WriteLine("RaiseALoan called.");
             return true;

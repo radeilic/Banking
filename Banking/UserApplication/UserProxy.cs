@@ -17,11 +17,11 @@ namespace UserApplication
 		{
             factory = this.CreateChannel();
         }
-        public bool OpenAccount()
+        public bool OpenAccount(string accountName)
         {
             try
             {
-                return factory.OpenAccount();
+                return factory.OpenAccount(accountName);
             }
             catch (Exception e)
             {
@@ -31,11 +31,11 @@ namespace UserApplication
             
         }
 
-        public bool Payment()
+        public bool Payment(bool isPayment,string accountName, int amount)
         {
             try
             {
-                return factory.Payment();
+                return factory.Payment(isPayment, accountName, amount);
             }
             catch (Exception e)
             {
@@ -44,11 +44,11 @@ namespace UserApplication
             }
         }
 
-        public bool RaiseALoan()
+        public bool RaiseALoan(string accountName, int amount)
         {
             try
             {
-                return factory.RaiseALoan();
+                return factory.RaiseALoan(accountName, amount);
             }
             catch (Exception e)
             {

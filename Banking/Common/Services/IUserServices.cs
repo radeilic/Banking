@@ -11,12 +11,13 @@ namespace Common.Services
     public interface IUserServices
     {
         [OperationContract]
-        bool OpenAccount();
+        bool OpenAccount(string accountName);
 
         [OperationContract]
-        bool RaiseALoan();
+        bool RaiseALoan(string accountName, int amount);
 
         [OperationContract]
-        bool Payment();
+        bool Payment(bool isPayment, string accountName, int amount);
+        
     }
 }

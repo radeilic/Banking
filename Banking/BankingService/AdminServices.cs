@@ -1,4 +1,5 @@
-﻿using Common.Services;
+﻿using Common;
+using Common.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,9 +16,14 @@ namespace BankingService
             return true;
         }
 
-        public bool CreateBase()
+        public bool Init()
         {
-            Console.WriteLine("CreateBase called.");
+            
+            Database.accounts = new List<Account>();
+            Database.accountsRequests = new Queue<Request>();
+            Database.loansRequests = new Queue<Request>();
+            Database.paymentRequests = new Queue<Request>();
+            
             return true;
         }
     }

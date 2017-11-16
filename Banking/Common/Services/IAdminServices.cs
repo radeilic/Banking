@@ -11,9 +11,10 @@ namespace Common.Services
     public interface IAdminServices
     {
         [OperationContract]
-        bool CreateBase();
+        bool Init();
 
         [OperationContract]
         bool CheckRequest();
+
     }
 }

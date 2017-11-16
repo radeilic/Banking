@@ -16,9 +16,9 @@ namespace UserApplication
 
             using (UserProxy proxy = new UserProxy(binding, new EndpointAddress(new Uri(address))))
             {
-                proxy.OpenAccount();
-                proxy.RaiseALoan();
-                proxy.Payment();
+                proxy.OpenAccount("123");
+                proxy.RaiseALoan("123", 123);
+                proxy.Payment(true, "123", 123);
             }
             Console.WriteLine("Press any key to close UserApp.");
             Console.ReadKey(true);
