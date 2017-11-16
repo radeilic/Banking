@@ -10,6 +10,7 @@ namespace Common
     {
         private DateTime timeOfCreation;
         private Account account;
+        private RequestState state;
 
         public DateTime TimeOfCreation
         {
@@ -23,10 +24,18 @@ namespace Common
             set { account = value; }
         }
 
+        public RequestState State
+        {
+            get { return state; }
+            set { state = value; }
+        }
+
+
         public Request(DateTime timeOfCreation, Account account)
         {
             this.TimeOfCreation = timeOfCreation;
             this.Account = account;
+            this.State = RequestState.WAIT;
         }
     }
 }

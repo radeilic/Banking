@@ -9,6 +9,10 @@ namespace Common
 
     public class Database
     {
+        public object accountsLock;
+        public object accountRequestsLock;
+        public object loansRequestsLock;
+        public object paymentsRequestsLock;
 
         public static List<Account> accounts;
         public static Queue<Request> accountsRequests;

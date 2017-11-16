@@ -16,7 +16,7 @@ namespace AdminApplication
 
             using (AdminProxy proxy = new AdminProxy(binding, new EndpointAddress(new Uri(address))))
             {
-                proxy.CreateBase();
+                proxy.Init();
                 proxy.CheckRequest();
             }
             Console.WriteLine("Press any key to close AdminApp.");

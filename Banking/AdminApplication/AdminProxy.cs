@@ -30,11 +30,11 @@ namespace AdminApplication
             }
         }
 
-        public bool CreateBase()
+        public bool Init()
         {
             try
             {
-                return factory.CreateBase();
+                return factory.Init();
             }
             catch (Exception e)
             {
@@ -42,5 +42,7 @@ namespace AdminApplication
                 return false;
             }
         }
+
+
     }
 }
