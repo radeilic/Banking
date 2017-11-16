@@ -16,23 +16,25 @@ namespace Common
             string owner = WindowsIdentity.GetCurrent().Name;
             Account account = new Account(owner, accountName);
 
-            foreach(Account a in Database.accounts)
-            {
-                if(account.AccountName==a.AccountName)
-                {
-                    Console.WriteLine("Account already in use!");
-                    return false;
-                }
-            }
+            ///TODO Nadji ime
+            //foreach(Account a in Database.accounts)
+            //{
+            //    if(account.AccountName==a.AccountName)
+            //    {
+            //        Console.WriteLine("Account already in use!");
+            //        return false;
+            //    }
+            //}
 
             DateTime now = DateTime.Now;
 
             Request request = new Request(now, account);
 
-            lock (Database.accountsRequests)
-            {
-                Database.accountsRequests.Enqueue(request);
-            }
+            ///TODO Dodaj
+            //lock (Database.accountsRequests)
+            //{
+            //    Database.accountsRequests.Enqueue(request);
+            //}
 
             while (request.State == RequestState.WAIT) 
             {
