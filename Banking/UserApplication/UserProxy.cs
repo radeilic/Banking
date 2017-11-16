@@ -1,7 +1,10 @@
-﻿using Common.Services;
+﻿using Common.Certifications;
+using Common.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
+using System.Security.Principal;
 using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,8 +18,16 @@ namespace UserApplication
         public UserProxy(NetTcpBinding binding, EndpointAddress address)
 			: base(binding, address)
 		{
+            string cltCertCN = "User";
+
+            this.Credentials.ServiceCertificate.Authentication.CertificateValidationMode = System.ServiceModel.Security.X509CertificateValidationMode.ChainTrust;
+            this.Credentials.ServiceCertificate.Authentication.CustomCertificateValidator = new ClientCertValidator();
+            this.Credentials.ServiceCertificate.Authentication.RevocationMode = X509RevocationMode.NoCheck;
+            this.Credentials.ClientCertificate.Certificate = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, cltCertCN);
+
             factory = this.CreateChannel();
         }
+
         public bool OpenAccount(string accountName)
         {
             try
@@ -55,6 +66,11 @@ namespace UserApplication
                 Console.WriteLine("Exception in RaiseALoan: {0}", e.Message);
                 return false;
             }
+        }
+
+        ~UserProxy()
+        {
+            this.Close();
         }
     }
 }
