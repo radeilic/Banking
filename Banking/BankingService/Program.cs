@@ -26,13 +26,24 @@ namespace BankingService
 
             binding.Security.Mode = SecurityMode.Message;
             binding.Security.Message.ClientCredentialType = MessageCredentialType.Certificate;
-            host1.Credentials.ClientCertificate.Authentication.CertificateValidationMode = X509CertificateValidationMode.Custom;
+            host1.Credentials.ClientCertificate.Authentication.CertificateValidationMode = X509CertificateValidationMode.ChainTrust;
             host1.Credentials.ClientCertificate.Authentication.CustomCertificateValidator = new ServiceCertValidator();
             host1.Credentials.ClientCertificate.Authentication.RevocationMode = X509RevocationMode.NoCheck;
             host1.Credentials.ServiceCertificate.Certificate = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, srvCertCN);
 
-            host1.Open();
-            Console.WriteLine("AdminServices is opened...");
+            try
+            {
+                host1.Open();
+                Console.WriteLine("AdminServices is opened...");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Error occurred while trying to open host for admins {e.Message}");
+                Console.WriteLine($"[StackTrace] {e.StackTrace}");
+                host1.Close();
+
+                return;
+            }
             
 
 
@@ -45,13 +56,26 @@ namespace BankingService
 
             binding2.Security.Mode = SecurityMode.Message;
             binding2.Security.Message.ClientCredentialType = MessageCredentialType.Certificate;
-            host2.Credentials.ClientCertificate.Authentication.CertificateValidationMode = X509CertificateValidationMode.Custom;
+            host2.Credentials.ClientCertificate.Authentication.CertificateValidationMode = X509CertificateValidationMode.ChainTrust;
             host2.Credentials.ClientCertificate.Authentication.CustomCertificateValidator = new ServiceCertValidator();
             host2.Credentials.ClientCertificate.Authentication.RevocationMode = X509RevocationMode.NoCheck;
             host2.Credentials.ServiceCertificate.Certificate = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, srvCertCN);
 
-            host2.Open();
-            Console.WriteLine("UserServices is opened...");
+            try
+            {
+                host2.Open();
+                Console.WriteLine("UserServices is opened...");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Error occurred while trying to open host for admins {e.Message}");
+                Console.WriteLine($"[StackTrace] {e.StackTrace}");
+                host1.Close();
+                host2.Close();
+
+                return;
+            }
+
 
 
 

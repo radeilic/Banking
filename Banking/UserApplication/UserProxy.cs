@@ -18,15 +18,16 @@ namespace UserApplication
         public UserProxy(NetTcpBinding binding, EndpointAddress address)
 			: base(binding, address)
 		{
-            string cltCertCN = Formatter.ParseName(WindowsIdentity.GetCurrent().Name);
+            string cltCertCN = "User";
 
-            this.Credentials.ServiceCertificate.Authentication.CertificateValidationMode = System.ServiceModel.Security.X509CertificateValidationMode.Custom;
-            //this.Credentials.ServiceCertificate.Authentication.CustomCertificateValidator = new ClientCertValidator();
+            this.Credentials.ServiceCertificate.Authentication.CertificateValidationMode = System.ServiceModel.Security.X509CertificateValidationMode.ChainTrust;
+            this.Credentials.ServiceCertificate.Authentication.CustomCertificateValidator = new ClientCertValidator();
             this.Credentials.ServiceCertificate.Authentication.RevocationMode = X509RevocationMode.NoCheck;
             this.Credentials.ClientCertificate.Certificate = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, cltCertCN);
 
             factory = this.CreateChannel();
         }
+
         public bool OpenAccount(string accountName)
         {
             try
@@ -65,6 +66,11 @@ namespace UserApplication
                 Console.WriteLine("Exception in RaiseALoan: {0}", e.Message);
                 return false;
             }
+        }
+
+        ~UserProxy()
+        {
+            this.Close();
         }
     }
 }
