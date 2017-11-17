@@ -12,7 +12,47 @@ namespace BankingService
     {
         public bool CheckRequest()
         {
-            Console.WriteLine("CheckRequest called.");
+            lock (Database.accountRequestsLock)
+            {
+                for (int i = 0;i < Database.accountsRequests.Count; i++)
+                {
+                    TimeSpan time = DateTime.Now - Database.accountsRequests[i].TimeOfCreation;
+                    double milliseconds = time.Milliseconds;
+                    if (milliseconds > 500)
+                    {
+                        Database.accountsRequests.RemoveAt(i);
+                        i--;
+                    }
+                }
+            }
+
+            lock (Database.loansRequestsLock)
+            {
+                for (int i = 0; i < Database.accountsRequests.Count; i++)
+                {
+                    TimeSpan time = DateTime.Now - Database.accountsRequests[i].TimeOfCreation;
+                    double milliseconds = time.Milliseconds;
+                    if (milliseconds > 500)
+                    {
+                        Database.accountsRequests.RemoveAt(i);
+                        i--;
+                    }
+                }
+            }
+
+            lock (Database.paymentsRequestsLock)
+            {
+                for (int i = 0; i < Database.accountsRequests.Count; i++)
+                {
+                    TimeSpan time = DateTime.Now - Database.accountsRequests[i].TimeOfCreation;
+                    double milliseconds = time.Milliseconds;
+                    if (milliseconds > 500)
+                    {
+                        Database.accountsRequests.RemoveAt(i);
+                        i--;
+                    }
+                }
+            }
             return true;
         }
 
