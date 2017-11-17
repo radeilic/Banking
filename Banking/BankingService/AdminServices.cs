@@ -64,11 +64,6 @@ namespace BankingService
             Database.loansRequests = new List<Request>();
             Database.paymentRequests = new List<Request>();
 
-            Database.accountRequestsLock = new object();
-            Database.accountsLock = new object();
-            Database.loansRequestsLock = new object();
-            Database.paymentsRequestsLock = new object();
-
             return true;
         }
     }
