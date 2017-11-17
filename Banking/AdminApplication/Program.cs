@@ -15,7 +15,6 @@ namespace AdminApplication
     {
         static void Main(string[] args)
         {
-            Console.ReadKey();
             Thread.CurrentPrincipal = new WindowsPrincipal(WindowsIdentity.GetCurrent());
 
             if (!Thread.CurrentPrincipal.IsInRole(Formatter.FormatName("BankingSystemAdmin")))

@@ -75,8 +75,8 @@ namespace BankingService
                 return;
             }
 
-            //Thread OpenAccountSectorThread = new Thread(Program.OpenAccountSector);
-            //OpenAccountSectorThread.Start();
+            Thread OpenAccountSectorThread = new Thread(Program.OpenAccountSector);
+            OpenAccountSectorThread.Start();
 
 
             Console.WriteLine("Press any key to close server.");
@@ -85,7 +85,40 @@ namespace BankingService
             host1.Close();
             host2.Close();
         }
+        static void OpenAccountSector()
+        {
+            while (true)
+            {
+                if (Database.accountsRequests != null)
+                {
+                    if (Database.accountsRequests.Count != 0)
+                    {
 
+                        lock (Database.accountRequestsLock)
+                        {
+                            Request req = Database.accountsRequests[Database.accountsRequests.Count - 1];
+
+                            lock (Database.accountsLock)
+                            {
+                                Database.accounts.Add(req.Account.AccountName, req.Account);
+                                Console.WriteLine("Account added.");
+                                Database.accountsRequests.Remove(req);
+                                req.State = RequestState.PROCCESSED;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        Thread.Sleep(500);
+                    }
+                }
+                else
+                {
+                    Thread.Sleep(500);
+                }
+            }
+        } 
         
+
     }
 }
