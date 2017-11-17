@@ -1,7 +1,10 @@
-﻿using System;
+﻿using Common.Certifications;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.ServiceModel;
+using System.ServiceModel.Security;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -11,10 +14,16 @@ namespace UserApplication
     {
         static void Main(string[] args)
         {
-            NetTcpBinding binding = new NetTcpBinding();
-            string address = "net.tcp://localhost:25001/UserServices";
+            string srvCertCN = "BankingService";
 
-            using (UserProxy proxy = new UserProxy(binding, new EndpointAddress(new Uri(address))))
+            NetTcpBinding binding = new NetTcpBinding();
+            binding.Security.Mode = SecurityMode.Message;
+            binding.Security.Message.ClientCredentialType = MessageCredentialType.Certificate;
+            X509Certificate2 srvCert = CertManager.GetCertificateFromStorage(StoreName.TrustedPeople, StoreLocation.LocalMachine, srvCertCN);
+            EndpointAddress address = new EndpointAddress(new Uri("net.tcp://localhost:25001/UserServices"),
+                                      new X509CertificateEndpointIdentity(srvCert));
+
+            using (UserProxy proxy = new UserProxy(binding, address))
             {
                 proxy.OpenAccount("123");
                 proxy.RaiseALoan("123", 123);
