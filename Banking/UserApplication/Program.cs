@@ -14,11 +14,13 @@ namespace UserApplication
     {
         static void Main(string[] args)
         {
+            Console.ReadKey();
+
             string srvCertCN = "BankingService";
 
             NetTcpBinding binding = new NetTcpBinding();
-            binding.Security.Mode = SecurityMode.Message;
-            binding.Security.Message.ClientCredentialType = MessageCredentialType.Certificate;
+            binding.Security.Mode = SecurityMode.Transport;
+            binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
             X509Certificate2 srvCert = CertManager.GetCertificateFromStorage(StoreName.TrustedPeople, StoreLocation.LocalMachine, srvCertCN);
             EndpointAddress address = new EndpointAddress(new Uri("net.tcp://localhost:25001/UserServices"),
                                       new X509CertificateEndpointIdentity(srvCert));

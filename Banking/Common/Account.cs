@@ -10,7 +10,8 @@ namespace Common
     {
         private string owner;
         private string accountName;
-        
+        private int amount;
+
         public string  Owner
         {
             get { return owner; }
@@ -23,10 +24,17 @@ namespace Common
             set { accountName = value; }
         }
 
+        public int Amount
+        {
+            get { return amount; }
+            set { amount = value; }
+        }
+
         public Account(string owner, string accountName)
         {
             this.Owner = owner;
             this.AccountName = accountName;
+            this.Amount = 0;
         }
     }
 }
