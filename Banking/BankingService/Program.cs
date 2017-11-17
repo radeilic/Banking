@@ -10,6 +10,7 @@ using Common.Certifications;
 using System.Security.Principal;
 using System.ServiceModel.Security;
 using System.Security.Cryptography.X509Certificates;
+using System.Threading;
 
 namespace BankingService
 {
@@ -76,11 +77,8 @@ namespace BankingService
                 return;
             }
 
-
-
-
-            Thread OpenAccountSectorThread = new Thread(Program.OpenAccountSector);
-            OpenAccountSectorThread.Start();
+            //Thread OpenAccountSectorThread = new Thread(Program.OpenAccountSector);
+            //OpenAccountSectorThread.Start();
 
 
             Console.WriteLine("Press any key to close server.");
@@ -89,5 +87,7 @@ namespace BankingService
             host1.Close();
             host2.Close();
         }
+
+        
     }
 }
