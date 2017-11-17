@@ -16,9 +16,10 @@ namespace Common
             string owner = WindowsIdentity.GetCurrent().Name;
             Account account = new Account(owner, accountName);
 
-            foreach(Account a in Database.accounts)
+            ///TODO Nadji ime
+            foreach (Account a in Database.accounts.Values)
             {
-                if(account.AccountName==a.AccountName)
+                if (account.AccountName == a.AccountName)
                 {
                     Console.WriteLine("Account already in use!");
                     return false;
@@ -29,9 +30,10 @@ namespace Common
 
             Request request = new Request(now, account);
 
-            lock (Database.accountsRequests)
+            ///TODO Dodaj
+            lock (Database.accountRequestsLock)
             {
-                Database.accountsRequests.Enqueue(request);
+                Database.accountsRequests.Insert(0, request);
             }
 
             while (request.State == RequestState.WAIT) 

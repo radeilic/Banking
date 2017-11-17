@@ -8,12 +8,20 @@ namespace Common
 {
     public class Account
     {
-        string owner;
-        string accountName;
+        private string owner;
+        private string accountName;
+        
+        public string  Owner
+        {
+            get { return owner; }
+            set { owner = value; }
+        }
 
-        public string Owner { get; set; }
-
-        public string AccountName { get; set; }
+        public string AccountName
+        {
+            get { return accountName; }
+            set { accountName = value; }
+        }
 
         public Account(string owner, string accountName)
         {

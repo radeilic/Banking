@@ -19,10 +19,10 @@ namespace BankingService
         public bool Init()
         {
             
-            Database.accounts = new List<Account>();
-            Database.accountsRequests = new Queue<Request>();
-            Database.loansRequests = new Queue<Request>();
-            Database.paymentRequests = new Queue<Request>();
+            Database.accounts = new Dictionary<string, Account>();
+            Database.accountsRequests = new List<Request>();
+            Database.loansRequests = new List<Request>();
+            Database.paymentRequests = new List<Request>();
             
             return true;
         }
