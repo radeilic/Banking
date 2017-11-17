@@ -10,6 +10,7 @@ using Common.Certifications;
 using System.Security.Principal;
 using System.ServiceModel.Security;
 using System.Security.Cryptography.X509Certificates;
+using System.Threading;
 
 namespace BankingService
 {
@@ -24,8 +25,8 @@ namespace BankingService
             ServiceHost host1 = new ServiceHost(typeof(AdminServices));
             host1.AddServiceEndpoint(typeof(IAdminServices), binding, address1);
 
-            binding.Security.Mode = SecurityMode.Message;
-            binding.Security.Message.ClientCredentialType = MessageCredentialType.Certificate;
+            binding.Security.Mode = SecurityMode.Transport;
+            binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
             host1.Credentials.ClientCertificate.Authentication.CertificateValidationMode = X509CertificateValidationMode.ChainTrust;
             host1.Credentials.ClientCertificate.Authentication.CustomCertificateValidator = new ServiceCertValidator();
             host1.Credentials.ClientCertificate.Authentication.RevocationMode = X509RevocationMode.NoCheck;
@@ -48,14 +49,12 @@ namespace BankingService
 
 
             NetTcpBinding binding2 = new NetTcpBinding();
-            binding2.Security.Mode = SecurityMode.Message;
-            binding2.Security.Message.ClientCredentialType = MessageCredentialType.Certificate;
             string address2 = "net.tcp://localhost:25001/UserServices";
             ServiceHost host2 = new ServiceHost(typeof(UserServices));
             host2.AddServiceEndpoint(typeof(IUserServices), binding2, address2);
 
-            binding2.Security.Mode = SecurityMode.Message;
-            binding2.Security.Message.ClientCredentialType = MessageCredentialType.Certificate;
+            binding2.Security.Mode = SecurityMode.Transport;
+            binding2.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
             host2.Credentials.ClientCertificate.Authentication.CertificateValidationMode = X509CertificateValidationMode.ChainTrust;
             host2.Credentials.ClientCertificate.Authentication.CustomCertificateValidator = new ServiceCertValidator();
             host2.Credentials.ClientCertificate.Authentication.RevocationMode = X509RevocationMode.NoCheck;
@@ -76,7 +75,8 @@ namespace BankingService
                 return;
             }
 
-
+            Thread OpenAccountSectorThread = new Thread(Program.OpenAccountSector);
+            OpenAccountSectorThread.Start();
 
 
             Console.WriteLine("Press any key to close server.");
@@ -85,8 +85,40 @@ namespace BankingService
             host1.Close();
             host2.Close();
         }
+        static void OpenAccountSector()
+        {
+            while (true)
+            {
+                if (Database.accountsRequests != null)
+                {
+                    if (Database.accountsRequests.Count != 0)
+                    {
 
+                        lock (Database.accountRequestsLock)
+                        {
+                            Request req = Database.accountsRequests[Database.accountsRequests.Count - 1];
 
+                            lock (Database.accountsLock)
+                            {
+                                Database.accounts.Add(req.Account.AccountName, req.Account);
+                                Console.WriteLine("Account added.");
+                                Database.accountsRequests.Remove(req);
+                                req.State = RequestState.PROCCESSED;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        Thread.Sleep(500);
+                    }
+                }
+                else
+                {
+                    Thread.Sleep(500);
+                }
+            }
+        } 
+        
 
     }
 }

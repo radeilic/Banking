@@ -14,22 +14,33 @@ namespace UserApplication
     {
         static void Main(string[] args)
         {
-            Console.ReadKey();
-
             string srvCertCN = "BankingService";
 
             NetTcpBinding binding = new NetTcpBinding();
-            binding.Security.Mode = SecurityMode.Message;
-            binding.Security.Message.ClientCredentialType = MessageCredentialType.Certificate;
+            binding.Security.Mode = SecurityMode.Transport;
+            binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
             X509Certificate2 srvCert = CertManager.GetCertificateFromStorage(StoreName.TrustedPeople, StoreLocation.LocalMachine, srvCertCN);
             EndpointAddress address = new EndpointAddress(new Uri("net.tcp://localhost:25001/UserServices"),
                                       new X509CertificateEndpointIdentity(srvCert));
 
             using (UserProxy proxy = new UserProxy(binding, address))
             {
-                proxy.OpenAccount("123");
-                proxy.RaiseALoan("123", 123);
-                proxy.Payment(true, "123", 123);
+
+                bool res=proxy.OpenAccount("123");
+                if (res)
+                {
+                    Console.WriteLine("Account Opened");
+                }
+                res=proxy.RaiseALoan("123", 123);
+                if (res)
+                {
+                    Console.WriteLine("Loan Raised.");
+                }
+                res = proxy.Payment(true, "123", 123);
+                if (res)
+                {
+                    Console.WriteLine("Payment successful.");
+                }
             }
             Console.WriteLine("Press any key to close UserApp.");
             Console.ReadKey(true);
