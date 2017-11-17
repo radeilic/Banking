@@ -9,15 +9,15 @@ namespace Common
 
     public class Database
     {
-        public object accountsLock;
-        public object accountRequestsLock;
-        public object loansRequestsLock;
-        public object paymentsRequestsLock;
+        public static object accountsLock;
+        public static object accountRequestsLock;
+        public static object loansRequestsLock;
+        public static object paymentsRequestsLock;
 
-        public static List<Account> accounts;
-        public static Queue<Request> accountsRequests;
-        public static Queue<Request> loansRequests;
-        public static Queue<Request> paymentRequests;
+        public static Dictionary<string, Account> accounts;
+        public static List<Request> accountsRequests;
+        public static List<Request> loansRequests;
+        public static List<Request> paymentRequests;
 
     }
 }
