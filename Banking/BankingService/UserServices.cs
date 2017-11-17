@@ -53,75 +53,36 @@ namespace Common
         /// <inheritdoc />
         public bool Payment(bool isPayment, string accountName, int amount)
         {
-            if(isPayment)
+
+            foreach (Account a in Database.accounts.Values)
             {
-                //Payment +
-
-                foreach (Account a in Database.accounts.Values)
+                if (accountName == a.AccountName)
                 {
-                    if (accountName == a.AccountName)
+                    DateTime now = DateTime.Now;
+
+                    //true is for + payment
+                    Request request = new Request(now, a, amount, isPayment);
+
+                    lock (Database.paymentsRequestsLock)
                     {
-                        DateTime now = DateTime.Now;
+                        Database.paymentRequests.Insert(0, request);
+                    }
 
-                        //true is for + payment
-                        Request request = new Request(now, a, amount, true);
+                    while (request.State == RequestState.WAIT)
+                    {
+                        Thread.Sleep(1000);
+                    }
 
-                        lock (Database.paymentsRequestsLock)
-                        {
-                            Database.paymentRequests.Insert(0, request);
-                        }
-
-                        while (request.State == RequestState.WAIT)
-                        {
-                            Thread.Sleep(1000);
-                        }
-
-                        if (request.State == RequestState.PROCCESSED)
-                        {
-                            return true;
-                        }
-                        else
-                        {
-                            return false;
-                        }
+                    if (request.State == RequestState.PROCCESSED)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
                     }
                 }
             }
-            else
-            {
-                //Payment -
-
-                foreach (Account a in Database.accounts.Values)
-                {
-                    if (accountName == a.AccountName)
-                    {
-                        DateTime now = DateTime.Now;
-
-                        //true is for - payment
-                        Request request = new Request(now, a, amount, false);
-
-                        lock (Database.paymentsRequestsLock)
-                        {
-                            Database.paymentRequests.Insert(0, request);
-                        }
-
-                        while (request.State == RequestState.WAIT)
-                        {
-                            Thread.Sleep(1000);
-                        }
-
-                        if (request.State == RequestState.PROCCESSED)
-                        {
-                            return true;
-                        }
-                        else
-                        {
-                            return false;
-                        }
-                    }
-                }
-            }
-
             return false;
 
         }

@@ -117,7 +117,42 @@ namespace BankingService
                     Thread.Sleep(500);
                 }
             }
-        } 
+        }
+
+        static void PaymentSector()
+        {
+            while (true)
+            {
+                if (Database.paymentRequests != null)
+                {
+                    if (Database.paymentRequests.Count != 0)
+                    {
+                        lock (Database.paymentsRequestsLock)
+                        {
+                            Request req = Database.paymentRequests[Database.paymentRequests.Count - 1];
+
+                            if (req.IsPayment)
+                            {
+                                lock (Database.accountsLock)
+                                {
+                                    req.Account.Amount += req.Amount;
+                                }
+                            }
+                            else
+                            {
+                                lock (Database.accountsLock)
+                                {
+                                    if (req.Account.Amount >= req.Amount)
+                                    {
+                                        req.Account.Amount -= req.Amount;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
         
 
     }
