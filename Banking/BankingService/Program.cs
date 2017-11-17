@@ -38,15 +38,5 @@ namespace BankingService
             host1.Close();
             host2.Close();
         }
-
-        static void OpenAccountSector()
-        {
-            while (true)
-            {
-                lock (Database.accountsRequests)
-                {
-                }
-            }
-        }
     }
 }
