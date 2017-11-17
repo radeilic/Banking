@@ -14,6 +14,8 @@ namespace UserApplication
     {
         static void Main(string[] args)
         {
+            Console.ReadKey();
+
             string srvCertCN = "BankingService";
 
             NetTcpBinding binding = new NetTcpBinding();

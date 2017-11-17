@@ -11,12 +11,12 @@ namespace Common
 {
     public class UserServices : IUserServices
     {
+        /// <inheritdoc />
         public bool OpenAccount(string accountName)
         {
             string owner = WindowsIdentity.GetCurrent().Name;
             Account account = new Account(owner, accountName);
 
-            ///TODO Nadji ime
             foreach (Account a in Database.accounts.Values)
             {
                 if (account.AccountName == a.AccountName)
@@ -30,7 +30,6 @@ namespace Common
 
             Request request = new Request(now, account, 0);
 
-            ///TODO Dodaj
             lock (Database.accountRequestsLock)
             {
                 Database.accountsRequests.Insert(0, request);
@@ -51,6 +50,7 @@ namespace Common
             }
         }
 
+        /// <inheritdoc />
         public bool Payment(bool isPayment, string accountName, int amount)
         {
             if(isPayment)
@@ -126,6 +126,7 @@ namespace Common
 
         }
 
+        /// <inheritdoc />
         public bool RaiseALoan(string accountName, int amount)
         {
             foreach (Account a in Database.accounts.Values)
