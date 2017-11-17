@@ -17,24 +17,24 @@ namespace Common
             Account account = new Account(owner, accountName);
 
             ///TODO Nadji ime
-            //foreach(Account a in Database.accounts)
-            //{
-            //    if(account.AccountName==a.AccountName)
-            //    {
-            //        Console.WriteLine("Account already in use!");
-            //        return false;
-            //    }
-            //}
+            foreach (Account a in Database.accounts.Values)
+            {
+                if (account.AccountName == a.AccountName)
+                {
+                    Console.WriteLine("Account already in use!");
+                    return false;
+                }
+            }
 
             DateTime now = DateTime.Now;
 
             Request request = new Request(now, account);
 
             ///TODO Dodaj
-            //lock (Database.accountsRequests)
-            //{
-            //    Database.accountsRequests.Enqueue(request);
-            //}
+            lock (Database.accountRequestsLock)
+            {
+                Database.accountsRequests.Insert(0, request);
+            }
 
             while (request.State == RequestState.WAIT) 
             {
