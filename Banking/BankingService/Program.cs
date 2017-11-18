@@ -11,6 +11,7 @@ using System.Security.Principal;
 using System.ServiceModel.Security;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
+using Common.Auditing;
 
 namespace BankingService
 {
