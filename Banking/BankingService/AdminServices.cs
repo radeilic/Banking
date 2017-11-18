@@ -54,7 +54,7 @@ namespace BankingService
                     }
                 }
             }
-            Audit.AuthorizationSuccess("Admin", "CheckRequest");
+            //Audit.AuthorizationSuccess("Admin", "CheckRequest");
 
             return true;
         }
@@ -66,7 +66,7 @@ namespace BankingService
             Database.accountsRequests = new List<Request>();
             Database.loansRequests = new List<Request>();
             Database.paymentRequests = new List<Request>();
-            Audit.AuthorizationSuccess("Admin", "Init");
+            //Audit.AuthorizationSuccess("Admin", "Init");
 
             return true;
         }

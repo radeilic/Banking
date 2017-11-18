@@ -61,20 +61,38 @@ namespace Common.Auditing {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Authorization failed. User {0} failed to access {1}. Reason: {2}.
+        ///   Looks up a localized string similar to Admin unsuccessfully completed operation {0}..
         /// </summary>
-        internal static string UserAuthorizationFailed {
+        internal static string AdminOperationFailed {
             get {
-                return ResourceManager.GetString("UserAuthorizationFailed", resourceCulture);
+                return ResourceManager.GetString("AdminOperationFailed", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to User {0} successfully accessed to {1}..
+        ///   Looks up a localized string similar to Admin successfully completed operation {0}..
         /// </summary>
-        internal static string UserAuthorizationSuccess {
+        internal static string AdminOperationSuccess {
             get {
-                return ResourceManager.GetString("UserAuthorizationSuccess", resourceCulture);
+                return ResourceManager.GetString("AdminOperationSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Operation failed. User {0} failed to access {1}. Reason: {2}.
+        /// </summary>
+        internal static string UserOperationFailed {
+            get {
+                return ResourceManager.GetString("UserOperationFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Operation success. User {0} successfully accessed to {1}..
+        /// </summary>
+        internal static string UserOperationSuccess {
+            get {
+                return ResourceManager.GetString("UserOperationSuccess", resourceCulture);
             }
         }
     }

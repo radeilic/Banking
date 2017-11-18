@@ -14,12 +14,6 @@ namespace Common.Auditing
         const string SourceName = "SecurityManager.Audit";
         const string LogName = "BankingLog";
 
-        /// <summary>
-        /// HOW TO LOG
-        /// Audit.AuthorizationSuccess(principal.Identity.Name, "Manage Network Model");
-        /// Audit.AuthorizationSuccess(principal.Identity.Name, OperationContext.Current.IncomingMessageHeaders.Action);
-        /// </summary>
-
         static Audit()
         {
             try
@@ -33,28 +27,41 @@ namespace Common.Auditing
             }
             catch (Exception e)
             {
+                Console.WriteLine($"Error occurred while trying to open log file.");
+                Console.WriteLine($"[StackTrace] {e.StackTrace}");
                 customLog = null;
             }
         }
 
-        public static void AuthorizationSuccess(string userName, string serviceName)
+        public static void UserOperationSuccess(string userName, string serviceName)
         {
-            string message = String.Format(AuditEvents.UserAuthorizationSuccess, userName, serviceName);
+            string message = String.Format(AuditEvents.UserOperationSuccess, userName, serviceName);
+
+            EventInstance ei = new EventInstance(1, 1, EventLogEntryType.SuccessAudit);
+
+            customLog.WriteEntry(message, EventLogEntryType.SuccessAudit);
+        }
+        public static void AdminOperationSuccess(string serviceName)
+        {
+            string message = String.Format(AuditEvents.AdminOperationSuccess, serviceName);
 
             EventInstance ei = new EventInstance(1, 1, EventLogEntryType.SuccessAudit);
 
             customLog.WriteEntry(message, EventLogEntryType.SuccessAudit);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="userName"></param>
-        /// <param name="serviceName"> should be read from the OperationContext as follows: OperationContext.Current.IncomingMessageHeaders.Action</param>
-        /// <param name="reason">permission name</param>
-        public static void AuthorizationFailed(string userName, string serviceName, string reason)
+        public static void UserOperationFailed(string userName, string serviceName, string reason)
         {
-            string message = String.Format(AuditEvents.UserAuthorizationFailed, userName,serviceName,reason);
+            string message = String.Format(AuditEvents.UserOperationFailed, userName,serviceName,reason);
+
+            EventInstance ei = new EventInstance(1, 1, EventLogEntryType.Error);
+
+            customLog.WriteEntry(message, EventLogEntryType.Error);
+        }
+
+        public static void AdminOperationFailed( string serviceName)
+        {
+            string message = String.Format(AuditEvents.AdminOperationFailed, serviceName);
 
             EventInstance ei = new EventInstance(1, 1, EventLogEntryType.Error);
 
