@@ -23,7 +23,7 @@ namespace Common
                 if (account.AccountName == a.AccountName)
                 {
                     Console.WriteLine("Account already in use!");
-                    //Audit.AuthorizationFailed("Banking User", "OpenAccount", "Account already in use!");
+                    Audit.UserOperationFailed("Banking User", "OpenAccount", "Account already in use!");
                     return false;
                 }
             }
@@ -44,7 +44,7 @@ namespace Common
             
             if(request.State==RequestState.PROCCESSED)
             {
-                //Audit.AuthorizationSuccess("Banking User", "OpenAccount");
+                Audit.UserOperationSuccess("Banking User", "OpenAccount");
                 return true;
             } 
             else
@@ -78,7 +78,7 @@ namespace Common
 
                     if (request.State == RequestState.PROCCESSED)
                     {
-                        //Audit.AuthorizationSuccess("Banking User", "Payment");
+                        Audit.UserOperationSuccess("Banking User", "Payment");
                         return true;
                     }
                     else
@@ -87,7 +87,7 @@ namespace Common
                     }
                 }
             }
-            //Audit.AuthorizationFailed("Banking User", "Payment", "No account information in database");
+            Audit.UserOperationFailed("Banking User", "Payment", "No account information in database");
             return false;
 
         }
@@ -116,7 +116,7 @@ namespace Common
 
                     if (request.State == RequestState.PROCCESSED)
                     {
-                        //Audit.AuthorizationSuccess("Banking User", "RaiseALoan");
+                        Audit.UserOperationSuccess("Banking User", "RaiseALoan");
                         return true;
                     }
                     else
@@ -125,7 +125,7 @@ namespace Common
                     }
                 }
             }
-            //Audit.AuthorizationFailed("Banking User", "RaiseALoan", "No account information in database");
+            Audit.UserOperationFailed("Banking User", "RaiseALoan", "No account information in database");
             return false;
         }
     }
