@@ -117,10 +117,16 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="UserAuthorizationFailed" xml:space="preserve">
-    <value>Authorization failed. User {0} failed to access {1}. Reason: {2}</value>
+  <data name="AdminOperationFailed" xml:space="preserve">
+    <value>Admin unsuccessfully completed operation {0}.</value>
   </data>
-  <data name="UserAuthorizationSuccess" xml:space="preserve">
-    <value>User {0} successfully accessed to {1}.</value>
+  <data name="AdminOperationSuccess" xml:space="preserve">
+    <value>Admin successfully completed operation {0}.</value>
+  </data>
+  <data name="UserOperationFailed" xml:space="preserve">
+    <value>Operation failed. User {0} failed to access {1}. Reason: {2}</value>
+  </data>
+  <data name="UserOperationSuccess" xml:space="preserve">
+    <value>Operation success. User {0} successfully accessed to {1}.</value>
   </data>
 </root>

@@ -10,8 +10,10 @@ namespace Common.Auditing
 {
     public enum AuditEventTypes
     {
-        UserAuthorizationSuccess = 0,
-        UserAuthorizationFailed = 1
+        UserOperationFailed = 0,
+        UserOperationSuccess = 1,
+        AdminOperationFailed = 2,
+        AdminOperationSuccess = 4
     }
 
     public class AuditEvents
@@ -34,19 +36,35 @@ namespace Common.Auditing
             }
         }
 
-        public static string UserAuthorizationSuccess
+        public static string UserOperationFailed
         {
             get
             {
-                return ResourceMgr.GetString(AuditEventTypes.UserAuthorizationSuccess.ToString());
+                return ResourceMgr.GetString(AuditEventTypes.UserOperationFailed.ToString());
             }
         }
 
-        public static string UserAuthorizationFailed
+        public static string UserOperationSuccess
         {
             get
             {
-                return ResourceMgr.GetString(AuditEventTypes.UserAuthorizationFailed.ToString());
+                return ResourceMgr.GetString(AuditEventTypes.UserOperationSuccess.ToString());
+            }
+        }
+
+        public static string AdminOperationFailed
+        {
+            get
+            {
+                return ResourceMgr.GetString(AuditEventTypes.AdminOperationFailed.ToString());
+            }
+        }
+
+        public static string AdminOperationSuccess
+        {
+            get
+            {
+                return ResourceMgr.GetString(AuditEventTypes.AdminOperationSuccess.ToString());
             }
         }
     }
