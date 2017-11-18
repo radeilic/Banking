@@ -1,4 +1,5 @@
-﻿using Common.Services;
+﻿using Common.Auditing;
+using Common.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,6 +23,7 @@ namespace Common
                 if (account.AccountName == a.AccountName)
                 {
                     Console.WriteLine("Account already in use!");
+                    Audit.AuthorizationFailed("Banking User", "OpenAccount", "Account already in use!");
                     return false;
                 }
             }
@@ -42,6 +44,7 @@ namespace Common
             
             if(request.State==RequestState.PROCCESSED)
             {
+                Audit.AuthorizationSuccess("Banking User", "OpenAccount");
                 return true;
             } 
             else
@@ -75,6 +78,7 @@ namespace Common
 
                     if (request.State == RequestState.PROCCESSED)
                     {
+                        Audit.AuthorizationSuccess("Banking User", "Payment");
                         return true;
                     }
                     else
@@ -83,6 +87,7 @@ namespace Common
                     }
                 }
             }
+            Audit.AuthorizationFailed("Banking User", "Payment", "No account information in database");
             return false;
 
         }
@@ -111,6 +116,7 @@ namespace Common
 
                     if (request.State == RequestState.PROCCESSED)
                     {
+                        Audit.AuthorizationSuccess("Banking User", "RaiseALoan");
                         return true;
                     }
                     else
@@ -119,7 +125,7 @@ namespace Common
                     }
                 }
             }
-
+            Audit.AuthorizationFailed("Banking User", "RaiseALoan", "No account information in database");
             return false;
         }
     }

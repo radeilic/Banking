@@ -44,6 +44,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Account.cs" />
+    <Compile Include="Auditing\Audit.cs" />
+    <Compile Include="Auditing\AuditEvents.cs" />
+    <Compile Include="Auditing\AuditEventsFile.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>AuditEventsFile.resx</DependentUpon>
+    </Compile>
     <Compile Include="Certifications\CertManager.cs" />
     <Compile Include="Certifications\ClientCertValidator.cs" />
     <Compile Include="Certifications\Formatter.cs" />
@@ -55,7 +62,12 @@
     <Compile Include="Services\IAdminServices.cs" />
     <Compile Include="Services\IUserServices.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="Auditing\AuditEventsFile.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>AuditEventsFile.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
