@@ -77,7 +77,10 @@ namespace BankingService
 
             Thread OpenAccountSectorThread = new Thread(Program.OpenAccountSector);
             OpenAccountSectorThread.Start();
-
+            Thread PaymentSectorThread = new Thread(Program.PaymentSector);
+            PaymentSectorThread.Start();
+            Thread LoansSectorThread = new Thread(Program.LoansSector);
+            LoansSectorThread.Start();
 
             Console.WriteLine("Press any key to close server.");
             Console.ReadKey();
@@ -91,9 +94,8 @@ namespace BankingService
             {
                 if (Database.accountsRequests != null)
                 {
-                    if (Database.accountsRequests.Count != 0)
+                    if (Database.accountsRequests.Count > 0)
                     {
-
                         lock (Database.accountRequestsLock)
                         {
                             Request req = Database.accountsRequests[Database.accountsRequests.Count - 1];
@@ -125,7 +127,7 @@ namespace BankingService
             {
                 if (Database.paymentRequests != null)
                 {
-                    if (Database.paymentRequests.Count != 0)
+                    if (Database.paymentRequests.Count > 0)
                     {
                         lock (Database.paymentsRequestsLock)
                         {
@@ -136,6 +138,8 @@ namespace BankingService
                                 lock (Database.accountsLock)
                                 {
                                     req.Account.Amount += req.Amount;
+                                    req.State = RequestState.PROCCESSED;
+                                    Database.paymentRequests.Remove(req);
                                 }
                             }
                             else
@@ -145,7 +149,46 @@ namespace BankingService
                                     if (req.Account.Amount >= req.Amount)
                                     {
                                         req.Account.Amount -= req.Amount;
+                                        req.State = RequestState.PROCCESSED;
+                                        Database.paymentRequests.Remove(req);
                                     }
+                                    else
+                                    {
+                                        req.State = RequestState.REJECTED;
+                                        Database.paymentRequests.Remove(req);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        static void LoansSector()
+        {
+            while (true)
+            {
+                if (Database.loansRequests != null)
+                {
+                    if (Database.loansRequests.Count > 0)
+                    {
+                        lock (Database.loansRequestsLock)
+                        {
+                            Request req = Database.loansRequests[Database.loansRequests.Count - 1];
+
+                            lock (Database.accountsLock)
+                            {
+                                if (req.Amount > 0)
+                                {
+                                    req.Account.Amount += req.Amount;
+                                    Database.loansRequests.Remove(req);
+                                    req.State = RequestState.PROCCESSED;
+                                }
+                                else
+                                {
+                                    Database.loansRequests.Remove(req);
+                                    req.State = RequestState.REJECTED;
                                 }
                             }
                         }
