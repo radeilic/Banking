@@ -55,7 +55,7 @@ namespace BankingService
                 }
             }
 
-            //Audit.AdminOperationSuccess("CheckRequest");
+            Audit.AdminOperationSuccess("CheckRequest");
             return true;
         }
 
@@ -66,7 +66,7 @@ namespace BankingService
             Database.accountsRequests = new List<Request>();
             Database.loansRequests = new List<Request>();
             Database.paymentRequests = new List<Request>();
-            //Audit.AdminOperationSuccess("Init");
+            Audit.AdminOperationSuccess("Init");
 
             return true;
         }
