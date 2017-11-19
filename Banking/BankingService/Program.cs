@@ -12,6 +12,7 @@ using System.ServiceModel.Security;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using Common.Auditing;
+using System.ServiceModel.Description;
 
 namespace BankingService
 {
@@ -32,6 +33,16 @@ namespace BankingService
             host1.Credentials.ClientCertificate.Authentication.CustomCertificateValidator = new ServiceCertValidator();
             host1.Credentials.ClientCertificate.Authentication.RevocationMode = X509RevocationMode.NoCheck;
             host1.Credentials.ServiceCertificate.Certificate = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, srvCertCN);
+
+
+            //ServiceSecurityAuditBehavior newAuditAdminService = new ServiceSecurityAuditBehavior();
+            //newAuditAdminService.AuditLogLocation = AuditLogLocation.Application;
+
+            //newAuditAdminService.ServiceAuthorizationAuditLevel = AuditLevel.SuccessOrFailure;
+            //newAuditAdminService.SuppressAuditFailure = true;
+
+            //host1.Description.Behaviors.Remove<ServiceSecurityAuditBehavior>();
+            //host1.Description.Behaviors.Add(newAuditAdminService);
 
             try
             {
@@ -60,6 +71,16 @@ namespace BankingService
             host2.Credentials.ClientCertificate.Authentication.CustomCertificateValidator = new ServiceCertValidator();
             host2.Credentials.ClientCertificate.Authentication.RevocationMode = X509RevocationMode.NoCheck;
             host2.Credentials.ServiceCertificate.Certificate = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, srvCertCN);
+
+
+            //ServiceSecurityAuditBehavior newAuditUserService = new ServiceSecurityAuditBehavior();
+            //newAuditUserService.AuditLogLocation = AuditLogLocation.Application;
+
+            //newAuditUserService.ServiceAuthorizationAuditLevel = AuditLevel.SuccessOrFailure;
+            //newAuditUserService.SuppressAuditFailure = true;
+
+            //host2.Description.Behaviors.Remove<ServiceSecurityAuditBehavior>();
+            //host2.Description.Behaviors.Add(newAuditUserService);
 
             try
             {
