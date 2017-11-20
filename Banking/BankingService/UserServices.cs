@@ -18,14 +18,13 @@ namespace Common
             string owner = WindowsIdentity.GetCurrent().Name;
             Account account = new Account(owner, accountName);
 
-            foreach (Account a in Database.accounts.Values)
+            if(Database.accounts.ContainsKey(accountName))
             {
-                if (account.AccountName == a.AccountName)
-                {
-                    Console.WriteLine("Account already in use!");
-                    Audit.UserOperationFailed("Banking User", "OpenAccount", "Account already in use!");
-                    return false;
-                }
+                Console.WriteLine("Account already in use!");
+
+                Audit.customLog.Source = "UserServices.OpenAccount";
+                Audit.UserOperationFailed("Banking User", "OpenAccount", "Account already in use!");
+                return false;
             }
 
             DateTime now = DateTime.Now;
@@ -44,6 +43,7 @@ namespace Common
             
             if(request.State==RequestState.PROCCESSED)
             {
+                Audit.customLog.Source = "UserServices.OpenAccount";
                 Audit.UserOperationSuccess("Banking User", "OpenAccount");
                 return true;
             } 
@@ -52,19 +52,18 @@ namespace Common
                 return false;
             }
         }
+        
 
-        /// <inheritdoc />
         public bool Payment(bool isPayment, string accountName, int amount)
         {
 
-            foreach (Account a in Database.accounts.Values)
+            if(Database.accounts.ContainsKey(accountName))
             {
-                if (accountName == a.AccountName)
-                {
+                
                     DateTime now = DateTime.Now;
 
                     //true is for + payment
-                    Request request = new Request(now, a, amount, isPayment);
+                    Request request = new Request(now, Database.accounts[accountName], amount, isPayment);
 
                     lock (Database.paymentsRequestsLock)
                     {
@@ -78,6 +77,7 @@ namespace Common
 
                     if (request.State == RequestState.PROCCESSED)
                     {
+                        Audit.customLog.Source = "UserServices.Payment";
                         Audit.UserOperationSuccess("Banking User", "Payment");
                         return true;
                     }
@@ -85,24 +85,25 @@ namespace Common
                     {
                         return false;
                     }
-                }
+                
             }
+
+            Audit.customLog.Source = "UserServices.Payment";
             Audit.UserOperationFailed("Banking User", "Payment", "No account information in database");
             return false;
 
         }
+        
 
-        /// <inheritdoc />
         public bool RaiseALoan(string accountName, int amount)
         {
-            foreach (Account a in Database.accounts.Values)
+            if(Database.accounts.ContainsKey(accountName))
             {
-                if (accountName == a.AccountName)
-                {
+                
                     DateTime now = DateTime.Now;
 
                     //true is for + payment
-                    Request request = new Request(now, a, amount);
+                    Request request = new Request(now, Database.accounts[accountName], amount);
 
                     lock (Database.loansRequestsLock)
                     {
@@ -116,6 +117,8 @@ namespace Common
 
                     if (request.State == RequestState.PROCCESSED)
                     {
+
+                        Audit.customLog.Source = "UserServices.RaiseALoan";
                         Audit.UserOperationSuccess("Banking User", "RaiseALoan");
                         return true;
                     }
@@ -123,8 +126,10 @@ namespace Common
                     {
                         return false;
                     }
-                }
+                
             }
+
+            Audit.customLog.Source = "UserServices.RaiseALoan";
             Audit.UserOperationFailed("Banking User", "RaiseALoan", "No account information in database");
             return false;
         }

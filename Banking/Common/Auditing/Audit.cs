@@ -10,7 +10,7 @@ namespace Common.Auditing
     public class Audit:IDisposable
     {
 
-        private static EventLog customLog = null;
+        public static EventLog customLog = null;
         const string SourceName = "Common.Audit";
         const string LogName = "BankingLog";
 
@@ -33,38 +33,35 @@ namespace Common.Auditing
             }
         }
 
+
         public static void UserOperationSuccess(string userName, string serviceName)
         {
             string message = String.Format(AuditEvents.UserOperationSuccess, userName, serviceName);
-
             EventInstance ei = new EventInstance(1, 1, EventLogEntryType.SuccessAudit);
-
             customLog.WriteEntry(message, EventLogEntryType.SuccessAudit);
         }
+
+
         public static void AdminOperationSuccess(string serviceName)
         {
             string message = String.Format(AuditEvents.AdminOperationSuccess, serviceName);
-
             EventInstance ei = new EventInstance(1, 1, EventLogEntryType.SuccessAudit);
-
             customLog.WriteEntry(message, EventLogEntryType.SuccessAudit);
         }
+
 
         public static void UserOperationFailed(string userName, string serviceName, string reason)
         {
             string message = String.Format(AuditEvents.UserOperationFailed, userName,serviceName,reason);
-
             EventInstance ei = new EventInstance(1, 1, EventLogEntryType.Error);
-
             customLog.WriteEntry(message, EventLogEntryType.Error);
         }
+
 
         public static void AdminOperationFailed( string serviceName)
         {
             string message = String.Format(AuditEvents.AdminOperationFailed, serviceName);
-
             EventInstance ei = new EventInstance(1, 1, EventLogEntryType.Error);
-
             customLog.WriteEntry(message, EventLogEntryType.Error);
         }
 
