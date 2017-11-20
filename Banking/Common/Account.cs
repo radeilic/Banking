@@ -17,8 +17,9 @@ namespace Common
         private DateTime currentDay;
         private int pin;
         private int loginAttempts;
+        private int requestsCount;
+        private DateTime? intervalBeginning;
 
-       
         public string  Owner
         {
             get { return owner; }
@@ -54,6 +55,7 @@ namespace Common
             get { return blockedUntil; }
             set { blockedUntil = value; }
         }
+
         public int DailyAmount
         {
             get { return dailyAmount; }
@@ -71,6 +73,19 @@ namespace Common
             get { return loginAttempts; }
             set { loginAttempts = value; }
         }
+        
+        public int RequestsCount
+        {
+            get { return requestsCount; }
+            set { requestsCount = value; }
+        }
+
+        public DateTime? IntevalBeginning
+        {
+            get { return intervalBeginning; }
+            set { intervalBeginning = value; }
+        }
+
 
         public Account(string owner, string accountName)
         {
@@ -81,6 +96,7 @@ namespace Common
             this.dailyAmount = 0;
             this.CurrentDay = DateTime.Now.Date;
             this.LoginAttempts = 0;
+            this.RequestsCount = 0;
         }
     }
 }

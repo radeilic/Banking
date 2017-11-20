@@ -39,17 +39,17 @@ namespace UserApplication
                     Console.WriteLine("==================================");
                     odabir = Console.ReadLine();
 
-                    string accountName="";
-                    string pin="";
+                    string accountName = "";
+                    string pin = "";
                     string amount = "";
 
-                    switch(odabir)
+                    switch (odabir)
                     {
                         case "1":
                             Console.WriteLine("Enter account name:");
                             accountName = Console.ReadLine();
                             int res = proxy.OpenAccount(accountName);
-                            if(res<0)
+                            if (res < 0)
                             {
                                 Console.WriteLine("Failed to create account.");
                             }
@@ -67,7 +67,7 @@ namespace UserApplication
                             amount = Console.ReadLine();
 
                             bool res2 = proxy.RaiseALoan(accountName, Int32.Parse(amount), Int32.Parse(pin));
-                            if(res2)
+                            if (res2)
                             {
                                 Console.WriteLine("Loan raised.");
                             }
