@@ -48,7 +48,7 @@ namespace AdminApplication
             }
             catch (Exception e)
             {
-                Console.WriteLine("Exception in CreateBase: {0}", e.Message);
+                Console.WriteLine("Exception in Init: {0}", e.Message);
                 return false;
             }
         }
