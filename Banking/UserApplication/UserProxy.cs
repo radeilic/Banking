@@ -28,7 +28,7 @@ namespace UserApplication
             factory = this.CreateChannel();
         }
 
-        public bool OpenAccount(string accountName)
+        public int OpenAccount(string accountName)
         {
             try
             {
@@ -37,16 +37,16 @@ namespace UserApplication
             catch (Exception e)
             {
                 Console.WriteLine("Exception in OpenAccount: {0}",e.Message);
-                return false;
+                return -1;
             }
             
         }
 
-        public bool Payment(bool isPayment,string accountName, int amount)
+        public bool Payment(bool isPayment,string accountName, int amount, int pin)
         {
             try
             {
-                return factory.Payment(isPayment, accountName, amount);
+                return factory.Payment(isPayment, accountName, amount, pin);
             }
             catch (Exception e)
             {
@@ -55,11 +55,11 @@ namespace UserApplication
             }
         }
 
-        public bool RaiseALoan(string accountName, int amount)
+        public bool RaiseALoan(string accountName, int amount, int pin)
         {
             try
             {
-                return factory.RaiseALoan(accountName, amount);
+                return factory.RaiseALoan(accountName, amount, pin);
             }
             catch (Exception e)
             {

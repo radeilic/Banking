@@ -25,22 +25,60 @@ namespace UserApplication
 
             using (UserProxy proxy = new UserProxy(binding, address))
             {
+                string odabir;
 
-                bool res=proxy.OpenAccount("123");
-                if (res)
+                do
                 {
-                    Console.WriteLine("Account Opened");
-                }
-                res=proxy.RaiseALoan("123", 123);
-                if (res)
-                {
-                    Console.WriteLine("Loan Raised.");
-                }
-                res = proxy.Payment(true, "123", 123);
-                if (res)
-                {
-                    Console.WriteLine("Payment successful.");
-                }
+                    Console.WriteLine("================Menu==============");
+                    Console.WriteLine("**********************************");
+                    Console.WriteLine();
+                    Console.WriteLine("1. Open account");
+                    Console.WriteLine("2. Raise a loan");
+                    Console.WriteLine("3. Payment");
+                    Console.WriteLine();
+                    Console.WriteLine("==================================");
+                    odabir = Console.ReadLine();
+
+                    string accountName="";
+                    string pin="";
+                    string amount = "";
+
+                    switch(odabir)
+                    {
+                        case "1":
+                            Console.WriteLine("Enter account name:");
+                            accountName = Console.ReadLine();
+                            int res = proxy.OpenAccount(accountName);
+                            if(res<0)
+                            {
+                                Console.WriteLine("Failed to create account.");
+                            }
+                            else
+                            {
+                                Console.WriteLine("Your PIN is: " + res);
+                            }
+                            break;
+                        case "2":
+                            Console.WriteLine("Enter account name:");
+                            accountName = Console.ReadLine();
+                            Console.WriteLine("Enter PIN:");
+                            pin = Console.ReadLine();
+                            Console.WriteLine("Enter amount:");
+                            amount = Console.ReadLine();
+
+                            bool res2 = proxy.RaiseALoan(accountName, Int32.Parse(amount), Int32.Parse(pin));
+                            if(res2)
+                            {
+                                Console.WriteLine("Loan raised.");
+                            }
+                            else
+                            {
+                                Console.WriteLine("Failed to raise a loan.");
+                            }
+                            break;
+                    }
+
+                } while (odabir != "1" && odabir != "2" && odabir != "3");
             }
             Console.WriteLine("Press any key to close UserApp.");
             Console.ReadKey(true);

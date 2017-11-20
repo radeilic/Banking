@@ -16,7 +16,7 @@ namespace Common.Services
         /// <param name="accountName"></param>
         /// <returns></returns>
         [OperationContract]
-        bool OpenAccount(string accountName);
+        int OpenAccount(string accountName);
 
         /// <summary>
         /// Loaning money amouunt
@@ -25,7 +25,7 @@ namespace Common.Services
         /// <param name="amount">Amount of money for loan</param>
         /// <returns></returns>
         [OperationContract]
-        bool RaiseALoan(string accountName, int amount);
+        bool RaiseALoan(string accountName, int amount, int pin);
 
         /// <summary>
         /// Payment method
@@ -35,7 +35,7 @@ namespace Common.Services
         /// <param name="amount"></param>
         /// <returns></returns>
         [OperationContract]
-        bool Payment(bool isPayment, string accountName, int amount);
+        bool Payment(bool isPayment, string accountName, int amount, int pin);
         
     }
 }
