@@ -1,4 +1,5 @@
-﻿using Common.Services;
+﻿using Common.Auditing;
+using Common.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,6 +23,7 @@ namespace Common
                 if (account.AccountName == a.AccountName)
                 {
                     Console.WriteLine("Account already in use!");
+                    //Audit.UserOperationFailed("Banking User", "OpenAccount", "Account already in use!");
                     return false;
                 }
             }
@@ -42,6 +44,7 @@ namespace Common
             
             if(request.State==RequestState.PROCCESSED)
             {
+                //Audit.UserOperationSuccess("Banking User", "OpenAccount");
                 return true;
             } 
             else
@@ -53,75 +56,38 @@ namespace Common
         /// <inheritdoc />
         public bool Payment(bool isPayment, string accountName, int amount)
         {
-            if(isPayment)
+
+            foreach (Account a in Database.accounts.Values)
             {
-                //Payment +
-
-                foreach (Account a in Database.accounts.Values)
+                if (accountName == a.AccountName)
                 {
-                    if (accountName == a.AccountName)
+                    DateTime now = DateTime.Now;
+
+                    //true is for + payment
+                    Request request = new Request(now, a, amount, isPayment);
+
+                    lock (Database.paymentsRequestsLock)
                     {
-                        DateTime now = DateTime.Now;
+                        Database.paymentRequests.Insert(0, request);
+                    }
 
-                        //true is for + payment
-                        Request request = new Request(now, a, amount, true);
+                    while (request.State == RequestState.WAIT)
+                    {
+                        Thread.Sleep(1000);
+                    }
 
-                        lock (Database.paymentsRequestsLock)
-                        {
-                            Database.paymentRequests.Insert(0, request);
-                        }
-
-                        while (request.State == RequestState.WAIT)
-                        {
-                            Thread.Sleep(1000);
-                        }
-
-                        if (request.State == RequestState.PROCCESSED)
-                        {
-                            return true;
-                        }
-                        else
-                        {
-                            return false;
-                        }
+                    if (request.State == RequestState.PROCCESSED)
+                    {
+                        //Audit.UserOperationSuccess("Banking User", "Payment");
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
                     }
                 }
             }
-            else
-            {
-                //Payment -
-
-                foreach (Account a in Database.accounts.Values)
-                {
-                    if (accountName == a.AccountName)
-                    {
-                        DateTime now = DateTime.Now;
-
-                        //true is for - payment
-                        Request request = new Request(now, a, amount, false);
-
-                        lock (Database.paymentsRequestsLock)
-                        {
-                            Database.paymentRequests.Insert(0, request);
-                        }
-
-                        while (request.State == RequestState.WAIT)
-                        {
-                            Thread.Sleep(1000);
-                        }
-
-                        if (request.State == RequestState.PROCCESSED)
-                        {
-                            return true;
-                        }
-                        else
-                        {
-                            return false;
-                        }
-                    }
-                }
-            }
-
+            //Audit.UserOperationFailed("Banking User", "Payment", "No account information in database");
             return false;
 
         }
@@ -150,6 +116,7 @@ namespace Common
 
                     if (request.State == RequestState.PROCCESSED)
                     {
+                        //Audit.UserOperationSuccess("Banking User", "RaiseALoan");
                         return true;
                     }
                     else
@@ -158,7 +125,7 @@ namespace Common
                     }
                 }
             }
-
+            //Audit.UserOperationFailed("Banking User", "RaiseALoan", "No account information in database");
             return false;
         }
     }
