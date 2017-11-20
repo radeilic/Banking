@@ -12,7 +12,6 @@ namespace Common
 {
     public class UserServices : IUserServices
     {
-        /// <inheritdoc />
         public bool OpenAccount(string accountName)
         {
             string owner = WindowsIdentity.GetCurrent().Name;
@@ -28,7 +27,6 @@ namespace Common
             }
 
             DateTime now = DateTime.Now;
-
             Request request = new Request(now, account, 0);
 
             lock (Database.accountRequestsLock)
@@ -56,35 +54,36 @@ namespace Common
 
         public bool Payment(bool isPayment, string accountName, int amount)
         {
-
             if(Database.accounts.ContainsKey(accountName))
             {
-                
-                    DateTime now = DateTime.Now;
+                if (CheckIfAccountIsBlocked(Database.accounts[accountName]))
+                    return false;
 
-                    //true is for + payment
-                    Request request = new Request(now, Database.accounts[accountName], amount, isPayment);
+                DateTime now = DateTime.Now;
 
-                    lock (Database.paymentsRequestsLock)
-                    {
-                        Database.paymentRequests.Insert(0, request);
-                    }
+                //true is for + payment
+                Request request = new Request(now, Database.accounts[accountName], amount, isPayment);
 
-                    while (request.State == RequestState.WAIT)
-                    {
-                        Thread.Sleep(1000);
-                    }
+                lock (Database.paymentsRequestsLock)
+                {
+                    Database.paymentRequests.Insert(0, request);
+                }
 
-                    if (request.State == RequestState.PROCCESSED)
-                    {
-                        Audit.customLog.Source = "UserServices.Payment";
-                        Audit.UserOperationSuccess("Banking User", "Payment");
-                        return true;
-                    }
-                    else
-                    {
-                        return false;
-                    }
+                while (request.State == RequestState.WAIT)
+                {
+                    Thread.Sleep(1000);
+                }
+
+                if (request.State == RequestState.PROCCESSED)
+                {
+                    Audit.customLog.Source = "UserServices.Payment";
+                    Audit.UserOperationSuccess("Banking User", "Payment");
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
                 
             }
 
@@ -99,39 +98,51 @@ namespace Common
         {
             if(Database.accounts.ContainsKey(accountName))
             {
-                
-                    DateTime now = DateTime.Now;
+                if (CheckIfAccountIsBlocked(Database.accounts[accountName]))
+                    return false;
 
-                    //true is for + payment
-                    Request request = new Request(now, Database.accounts[accountName], amount);
+                DateTime now = DateTime.Now;
 
-                    lock (Database.loansRequestsLock)
-                    {
-                        Database.loansRequests.Insert(0, request);
-                    }
+                //true is for + payment
+                Request request = new Request(now, Database.accounts[accountName], amount);
 
-                    while (request.State == RequestState.WAIT)
-                    {
-                        Thread.Sleep(1000);
-                    }
+                lock (Database.loansRequestsLock)
+                {
+                    Database.loansRequests.Insert(0, request);
+                }
 
-                    if (request.State == RequestState.PROCCESSED)
-                    {
+                while (request.State == RequestState.WAIT)
+                {
+                    Thread.Sleep(1000);
+                }
 
-                        Audit.customLog.Source = "UserServices.RaiseALoan";
-                        Audit.UserOperationSuccess("Banking User", "RaiseALoan");
-                        return true;
-                    }
-                    else
-                    {
-                        return false;
-                    }
+                if (request.State == RequestState.PROCCESSED)
+                {
+
+                    Audit.customLog.Source = "UserServices.RaiseALoan";
+                    Audit.UserOperationSuccess("Banking User", "RaiseALoan");
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
                 
             }
 
             Audit.customLog.Source = "UserServices.RaiseALoan";
             Audit.UserOperationFailed("Banking User", "RaiseALoan", "No account information in database");
             return false;
+        }
+
+        public bool CheckIfAccountIsBlocked(Account account)
+        {
+            if (account.IsBlocked)
+                if (DateTime.Now > account.BlockedUntil)
+                    account.IsBlocked = false;
+            return false;
+
+            return account.IsBlocked;
         }
     }
 }

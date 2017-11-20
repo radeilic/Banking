@@ -36,7 +36,22 @@ namespace UserApplication
                 {
                     Console.WriteLine("Loan Raised.");
                 }
-                res = proxy.Payment(true, "123", 123);
+                res = proxy.Payment(true, "123", 2000);
+                if (res)
+                {
+                    Console.WriteLine("Payment successful.");
+                }
+                res = proxy.Payment(false, "123", 500);
+                if (res)
+                {
+                    Console.WriteLine("Payment successful.");
+                }
+                res = proxy.Payment(false, "123", 200);
+                if (res)
+                {
+                    Console.WriteLine("Payment successful.");
+                }
+                res = proxy.Payment(false, "123", 400);
                 if (res)
                 {
                     Console.WriteLine("Payment successful.");

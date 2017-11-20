@@ -172,9 +172,26 @@ namespace BankingService
                             {
                                 lock (Database.accountsLock)
                                 {
+                                    if (DateTime.Now.Date > req.Account.CurrentDay)
+                                    {
+                                        req.Account.CurrentDay = DateTime.Now.Date;
+                                        req.Account.DailyAmount = 0;
+                                    }
+                                    else
+                                        if ((req.Account.DailyAmount + req.Amount) > 1000)
+                                        {
+                                            req.Account.IsBlocked = true;
+                                            req.Account.BlockedUntil = DateTime.Now.AddDays(1);
+
+                                            req.State = RequestState.REJECTED;
+                                            Database.paymentRequests.Remove(req);
+                                            break;
+                                        }
+
                                     if (req.Account.Amount >= req.Amount)
                                     {
                                         req.Account.Amount -= req.Amount;
+                                        req.Account.DailyAmount += req.Amount;
                                         req.State = RequestState.PROCCESSED;
                                         Database.paymentRequests.Remove(req);
                                     }
@@ -222,7 +239,5 @@ namespace BankingService
                 }
             }
         }
-        
-
     }
 }
