@@ -12,7 +12,8 @@ namespace Common
 {
     public class UserServices : IUserServices
     {
-        public bool OpenAccount(string accountName)
+        /// <inheritdoc />
+        public int OpenAccount(string accountName)
         {
             string owner = WindowsIdentity.GetCurrent().Name;
             Account account = new Account(owner, accountName);
@@ -23,7 +24,7 @@ namespace Common
 
                 Audit.customLog.Source = "UserServices.OpenAccount";
                 Audit.UserOperationFailed("Banking User", "OpenAccount", "Account already in use!");
-                return false;
+                return -1;
             }
 
             DateTime now = DateTime.Now;
@@ -43,26 +44,33 @@ namespace Common
             {
                 Audit.customLog.Source = "UserServices.OpenAccount";
                 Audit.UserOperationSuccess("Banking User", "OpenAccount");
-                return true;
+                return request.Account.PIN;
             } 
             else
             {
-                return false;
+                return -1;
             }
         }
         
 
-        public bool Payment(bool isPayment, string accountName, int amount)
+        public bool Payment(bool isPayment, string accountName, int amount, int pin)
         {
             if(Database.accounts.ContainsKey(accountName))
             {
-                if (CheckIfAccountIsBlocked(Database.accounts[accountName]))
+                Account account;
+
+                lock (Database.accountsLock)
+                {
+                    account = Database.accounts[accountName];
+                }
+
+                if (CheckIfAccountIsBlocked(account))
                     return false;
 
                 DateTime now = DateTime.Now;
 
                 //true is for + payment
-                Request request = new Request(now, Database.accounts[accountName], amount, isPayment);
+                Request request = new Request(now, account, amount, isPayment);
 
                 lock (Database.paymentsRequestsLock)
                 {
@@ -94,17 +102,39 @@ namespace Common
         }
         
 
-        public bool RaiseALoan(string accountName, int amount)
+        public bool RaiseALoan(string accountName, int amount, int pin)
         {
             if(Database.accounts.ContainsKey(accountName))
             {
-                if (CheckIfAccountIsBlocked(Database.accounts[accountName]))
-                    return false;
+                Account account;
 
+                lock(Database.accountsLock)
+                {
+                    account = Database.accounts[accountName];
+                }
+
+                if (CheckIfAccountIsBlocked(account))
+                    return false;
+                
+                if(account.PIN!=pin)
+                {
+                    if(account.LoginAttempts==3)
+                    {
+                        account.IsBlocked = true;
+                        account.BlockedUntil = DateTime.Now.AddDays(1);
+                    }
+                    else
+                    {
+                        account.LoginAttempts++;
+                        return false;
+                    }
+                }
+
+                Database.accounts[accountName].LoginAttempts = 0;
                 DateTime now = DateTime.Now;
 
                 //true is for + payment
-                Request request = new Request(now, Database.accounts[accountName], amount);
+                Request request = new Request(now, account, amount);
 
                 lock (Database.loansRequestsLock)
                 {
@@ -140,7 +170,6 @@ namespace Common
             if (account.IsBlocked)
                 if (DateTime.Now > account.BlockedUntil)
                     account.IsBlocked = false;
-            return false;
 
             return account.IsBlocked;
         }

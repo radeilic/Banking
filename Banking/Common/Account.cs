@@ -15,12 +15,20 @@ namespace Common
         private DateTime blockedUntil;
         private int dailyAmount;
         private DateTime currentDay;
+        private int pin;
+        private int loginAttempts;
 
        
         public string  Owner
         {
             get { return owner; }
             set { owner = value; }
+        }
+
+        public int PIN
+        {
+            get { return pin; }
+            set { pin = value; }
         }
 
         public string AccountName
@@ -58,6 +66,12 @@ namespace Common
             set { currentDay = value; }
         }
 
+        public int LoginAttempts
+        {
+            get { return loginAttempts; }
+            set { loginAttempts = value; }
+        }
+
         public Account(string owner, string accountName)
         {
             this.Owner = owner;
@@ -66,6 +80,7 @@ namespace Common
             this.IsBlocked = false;
             this.dailyAmount = 0;
             this.CurrentDay = DateTime.Now.Date;
+            this.LoginAttempts = 0;
         }
     }
 }
