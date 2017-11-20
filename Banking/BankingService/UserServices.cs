@@ -18,20 +18,12 @@ namespace Common
             string owner = WindowsIdentity.GetCurrent().Name;
             Account account = new Account(owner, accountName);
 
-            //foreach (Account a in Database.accounts.Values)
-            //{
-            //    if (account.AccountName == a.AccountName)
-            //    {
-            //        Console.WriteLine("Account already in use!");
-            //        //Audit.UserOperationFailed("Banking User", "OpenAccount", "Account already in use!");
-            //        return false;
-            //    }
-            //}
-
             if(Database.accounts.ContainsKey(accountName))
             {
                 Console.WriteLine("Account already in use!");
-                //Audit.UserOperationFailed("Banking User", "OpenAccount", "Account already in use!");
+
+                Audit.customLog.Source = "UserServices.OpenAccount";
+                Audit.UserOperationFailed("Banking User", "OpenAccount", "Account already in use!");
                 return false;
             }
 
@@ -51,7 +43,8 @@ namespace Common
             
             if(request.State==RequestState.PROCCESSED)
             {
-                //Audit.UserOperationSuccess("Banking User", "OpenAccount");
+                Audit.customLog.Source = "UserServices.OpenAccount";
+                Audit.UserOperationSuccess("Banking User", "OpenAccount");
                 return true;
             } 
             else
@@ -59,8 +52,8 @@ namespace Common
                 return false;
             }
         }
+        
 
-        /// <inheritdoc />
         public bool Payment(bool isPayment, string accountName, int amount)
         {
 
@@ -84,7 +77,8 @@ namespace Common
 
                     if (request.State == RequestState.PROCCESSED)
                     {
-                        //Audit.UserOperationSuccess("Banking User", "Payment");
+                        Audit.customLog.Source = "UserServices.Payment";
+                        Audit.UserOperationSuccess("Banking User", "Payment");
                         return true;
                     }
                     else
@@ -93,12 +87,14 @@ namespace Common
                     }
                 
             }
-            //Audit.UserOperationFailed("Banking User", "Payment", "No account information in database");
+
+            Audit.customLog.Source = "UserServices.Payment";
+            Audit.UserOperationFailed("Banking User", "Payment", "No account information in database");
             return false;
 
         }
+        
 
-        /// <inheritdoc />
         public bool RaiseALoan(string accountName, int amount)
         {
             if(Database.accounts.ContainsKey(accountName))
@@ -121,7 +117,9 @@ namespace Common
 
                     if (request.State == RequestState.PROCCESSED)
                     {
-                        //Audit.UserOperationSuccess("Banking User", "RaiseALoan");
+
+                        Audit.customLog.Source = "UserServices.RaiseALoan";
+                        Audit.UserOperationSuccess("Banking User", "RaiseALoan");
                         return true;
                     }
                     else
@@ -130,7 +128,9 @@ namespace Common
                     }
                 
             }
-            //Audit.UserOperationFailed("Banking User", "RaiseALoan", "No account information in database");
+
+            Audit.customLog.Source = "UserServices.RaiseALoan";
+            Audit.UserOperationFailed("Banking User", "RaiseALoan", "No account information in database");
             return false;
         }
     }
