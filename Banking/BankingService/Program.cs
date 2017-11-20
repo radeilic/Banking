@@ -72,14 +72,14 @@ namespace BankingService
             host2.Credentials.ServiceCertificate.Certificate = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, srvCertCN);
 
 
-            ServiceSecurityAuditBehavior newAuditUserService = new ServiceSecurityAuditBehavior();
-            newAuditUserService.AuditLogLocation = AuditLogLocation.Application;
+            //ServiceSecurityAuditBehavior newAuditUserService = new ServiceSecurityAuditBehavior();
+            //newAuditUserService.AuditLogLocation = AuditLogLocation.Application;
 
-            newAuditUserService.ServiceAuthorizationAuditLevel = AuditLevel.SuccessOrFailure;
-            newAuditUserService.SuppressAuditFailure = true;
+            //newAuditUserService.ServiceAuthorizationAuditLevel = AuditLevel.SuccessOrFailure;
+            //newAuditUserService.SuppressAuditFailure = true;
 
-            host2.Description.Behaviors.Remove<ServiceSecurityAuditBehavior>();
-            host2.Description.Behaviors.Add(newAuditUserService);
+            //host2.Description.Behaviors.Remove<ServiceSecurityAuditBehavior>();
+            //host2.Description.Behaviors.Add(newAuditUserService);
 
             try
             {
@@ -108,6 +108,9 @@ namespace BankingService
 
             host1.Close();
             host2.Close();
+            OpenAccountSectorThread.Abort();
+            PaymentSectorThread.Abort();
+            LoansSectorThread.Abort();
         }
         static void OpenAccountSector()
         {
