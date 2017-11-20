@@ -123,6 +123,12 @@
   <data name="AdminOperationSuccess" xml:space="preserve">
     <value>Admin successfully completed operation {0}.</value>
   </data>
+  <data name="Admin_User_Authentication_Authorization_Fail" xml:space="preserve">
+    <value>Admin or User unsuccessfully  authentificated or authorized.</value>
+  </data>
+  <data name="Admin_User_Authentication_Authorization_Success" xml:space="preserve">
+    <value>Admin or User successfully  authentificated or authorized.</value>
+  </data>
   <data name="UserOperationFailed" xml:space="preserve">
     <value>Operation failed. User {0} failed to access {1}. Reason: {2}</value>
   </data>

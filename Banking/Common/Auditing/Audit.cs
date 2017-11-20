@@ -49,6 +49,12 @@ namespace Common.Auditing
             customLog.WriteEntry(message, EventLogEntryType.SuccessAudit);
         }
 
+        public static void Admin_User_Authentication_Authorization_Success(string serviceName)
+        {
+            string message = String.Format(AuditEvents.AdminOperationFailed, serviceName);
+            EventInstance ei = new EventInstance(1, 1, EventLogEntryType.SuccessAudit);
+            customLog.WriteEntry(message, EventLogEntryType.SuccessAudit);
+        }
 
         public static void UserOperationFailed(string userName, string serviceName, string reason)
         {
@@ -59,6 +65,13 @@ namespace Common.Auditing
 
 
         public static void AdminOperationFailed( string serviceName)
+        {
+            string message = String.Format(AuditEvents.AdminOperationFailed, serviceName);
+            EventInstance ei = new EventInstance(1, 1, EventLogEntryType.Error);
+            customLog.WriteEntry(message, EventLogEntryType.Error);
+        }
+
+        public static void Admin_User_Authentication_Authorization_Failed(string serviceName)
         {
             string message = String.Format(AuditEvents.AdminOperationFailed, serviceName);
             EventInstance ei = new EventInstance(1, 1, EventLogEntryType.Error);
