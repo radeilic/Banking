@@ -34,15 +34,14 @@ namespace BankingService
             host1.Credentials.ClientCertificate.Authentication.RevocationMode = X509RevocationMode.NoCheck;
             host1.Credentials.ServiceCertificate.Certificate = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, srvCertCN);
 
+            //ServiceSecurityAuditBehavior newAuditAdminService = new ServiceSecurityAuditBehavior();
+            //newAuditAdminService.AuditLogLocation = AuditLogLocation.Application;
 
-            ServiceSecurityAuditBehavior newAuditAdminService = new ServiceSecurityAuditBehavior();
-            newAuditAdminService.AuditLogLocation = AuditLogLocation.Application;
+            //newAuditAdminService.MessageAuthenticationAuditLevel = AuditLevel.SuccessOrFailure;
+            //newAuditAdminService.SuppressAuditFailure = true;
 
-            newAuditAdminService.ServiceAuthorizationAuditLevel = AuditLevel.SuccessOrFailure;
-            newAuditAdminService.SuppressAuditFailure = true;
-
-            host1.Description.Behaviors.Remove<ServiceSecurityAuditBehavior>();
-            host1.Description.Behaviors.Add(newAuditAdminService);
+            //host1.Description.Behaviors.Remove<ServiceSecurityAuditBehavior>();
+            //host1.Description.Behaviors.Add(newAuditAdminService);
 
             try
             {
