@@ -188,7 +188,7 @@ namespace BankingService
 
                                             req.State = RequestState.REJECTED;
                                             Database.paymentRequests.Remove(req);
-                                            break;
+                                            continue;
                                         }
 
                                     if (req.Account.Amount >= req.Amount)
