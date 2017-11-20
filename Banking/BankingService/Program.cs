@@ -114,6 +114,7 @@ namespace BankingService
             PaymentSectorThread.Abort();
             LoansSectorThread.Abort();
         }
+
         static void OpenAccountSector()
         {
             while (true)
@@ -128,6 +129,8 @@ namespace BankingService
 
                             lock (Database.accountsLock)
                             {
+                                Random rand = new Random();
+                                req.Account.PIN = rand.Next(1000, 9999);
                                 Database.accounts.Add(req.Account.AccountName, req.Account);
                                 Console.WriteLine("Account added.");
                                 Database.accountsRequests.Remove(req);

@@ -12,7 +12,8 @@ namespace Common
 {
     public class UserServices : IUserServices
     {
-        public bool OpenAccount(string accountName)
+        /// <inheritdoc />
+        public int OpenAccount(string accountName)
         {
             string owner = WindowsIdentity.GetCurrent().Name;
             Account account = new Account(owner, accountName);
@@ -23,7 +24,7 @@ namespace Common
 
                 Audit.customLog.Source = "UserServices.OpenAccount";
                 Audit.UserOperationFailed("Banking User", "OpenAccount", "Account already in use!");
-                return false;
+                return -1;
             }
 
             DateTime now = DateTime.Now;
@@ -43,16 +44,16 @@ namespace Common
             {
                 Audit.customLog.Source = "UserServices.OpenAccount";
                 Audit.UserOperationSuccess("Banking User", "OpenAccount");
-                return true;
+                return request.Account.PIN;
             } 
             else
             {
-                return false;
+                return -1;
             }
         }
         
 
-        public bool Payment(bool isPayment, string accountName, int amount)
+        public bool Payment(bool isPayment, string accountName, int amount, int pin)
         {
             if(Database.accounts.ContainsKey(accountName))
             {
@@ -94,12 +95,28 @@ namespace Common
         }
         
 
-        public bool RaiseALoan(string accountName, int amount)
+        public bool RaiseALoan(string accountName, int amount, int pin)
         {
             if(Database.accounts.ContainsKey(accountName))
             {
                 if (CheckIfAccountIsBlocked(Database.accounts[accountName]))
                     return false;
+
+                DateTime now = DateTime.Now;
+                if(Database.accounts[accountName].PIN!=pin)
+                {
+                    if(Database.accounts[accountName].LoginAttempts==3)
+                    {
+
+                    }
+                    else
+                    {
+                        Database.accounts[accountName].LoginAttempts++;
+                        return false;
+                    }
+                }
+
+                Database.accounts[accountName].LoginAttempts = 0;
 
                 DateTime now = DateTime.Now;
 
