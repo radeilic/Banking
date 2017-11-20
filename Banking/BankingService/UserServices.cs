@@ -57,13 +57,20 @@ namespace Common
         {
             if(Database.accounts.ContainsKey(accountName))
             {
-                if (CheckIfAccountIsBlocked(Database.accounts[accountName]))
+                Account account;
+
+                lock (Database.accountsLock)
+                {
+                    account = Database.accounts[accountName];
+                }
+
+                if (CheckIfAccountIsBlocked(account))
                     return false;
 
                 DateTime now = DateTime.Now;
 
                 //true is for + payment
-                Request request = new Request(now, Database.accounts[accountName], amount, isPayment);
+                Request request = new Request(now, account, amount, isPayment);
 
                 lock (Database.paymentsRequestsLock)
                 {
@@ -99,29 +106,35 @@ namespace Common
         {
             if(Database.accounts.ContainsKey(accountName))
             {
-                if (CheckIfAccountIsBlocked(Database.accounts[accountName]))
-                    return false;
+                Account account;
 
-                DateTime now = DateTime.Now;
-                if(Database.accounts[accountName].PIN!=pin)
+                lock(Database.accountsLock)
                 {
-                    if(Database.accounts[accountName].LoginAttempts==3)
-                    {
+                    account = Database.accounts[accountName];
+                }
 
+                if (CheckIfAccountIsBlocked(account))
+                    return false;
+                
+                if(account.PIN!=pin)
+                {
+                    if(account.LoginAttempts==3)
+                    {
+                        account.IsBlocked = true;
+                        account.BlockedUntil = DateTime.Now.AddDays(1);
                     }
                     else
                     {
-                        Database.accounts[accountName].LoginAttempts++;
+                        account.LoginAttempts++;
                         return false;
                     }
                 }
 
                 Database.accounts[accountName].LoginAttempts = 0;
-
                 DateTime now = DateTime.Now;
 
                 //true is for + payment
-                Request request = new Request(now, Database.accounts[accountName], amount);
+                Request request = new Request(now, account, amount);
 
                 lock (Database.loansRequestsLock)
                 {
@@ -157,7 +170,6 @@ namespace Common
             if (account.IsBlocked)
                 if (DateTime.Now > account.BlockedUntil)
                     account.IsBlocked = false;
-            return false;
 
             return account.IsBlocked;
         }
