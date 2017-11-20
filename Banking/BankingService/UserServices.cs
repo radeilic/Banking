@@ -13,7 +13,7 @@ namespace Common
     public class UserServices : IUserServices
     {
         /// <inheritdoc />
-        public bool OpenAccount(string accountName)
+        public int OpenAccount(string accountName)
         {
             string owner = WindowsIdentity.GetCurrent().Name;
             Account account = new Account(owner, accountName);
@@ -24,7 +24,7 @@ namespace Common
 
                 Audit.customLog.Source = "UserServices.OpenAccount";
                 Audit.UserOperationFailed("Banking User", "OpenAccount", "Account already in use!");
-                return false;
+                return -1;
             }
 
             DateTime now = DateTime.Now;
@@ -45,16 +45,16 @@ namespace Common
             {
                 Audit.customLog.Source = "UserServices.OpenAccount";
                 Audit.UserOperationSuccess("Banking User", "OpenAccount");
-                return true;
+                return request.Account.PIN;
             } 
             else
             {
-                return false;
+                return -1;
             }
         }
         
 
-        public bool Payment(bool isPayment, string accountName, int amount)
+        public bool Payment(bool isPayment, string accountName, int amount, int pin)
         {
 
             if(Database.accounts.ContainsKey(accountName))
@@ -95,37 +95,51 @@ namespace Common
         }
         
 
-        public bool RaiseALoan(string accountName, int amount)
+        public bool RaiseALoan(string accountName, int amount, int pin)
         {
             if(Database.accounts.ContainsKey(accountName))
             {
-                
-                    DateTime now = DateTime.Now;
-
-                    //true is for + payment
-                    Request request = new Request(now, Database.accounts[accountName], amount);
-
-                    lock (Database.loansRequestsLock)
-                    {
-                        Database.loansRequests.Insert(0, request);
-                    }
-
-                    while (request.State == RequestState.WAIT)
-                    {
-                        Thread.Sleep(1000);
-                    }
-
-                    if (request.State == RequestState.PROCCESSED)
+                if(Database.accounts[accountName].PIN!=pin)
+                {
+                    if(Database.accounts[accountName].LoginAttempts==3)
                     {
 
-                        Audit.customLog.Source = "UserServices.RaiseALoan";
-                        Audit.UserOperationSuccess("Banking User", "RaiseALoan");
-                        return true;
                     }
                     else
                     {
+                        Database.accounts[accountName].LoginAttempts++;
                         return false;
                     }
+                }
+
+                Database.accounts[accountName].LoginAttempts = 0;
+
+                DateTime now = DateTime.Now;
+
+                //true is for + payment
+                Request request = new Request(now, Database.accounts[accountName], amount);
+
+                lock (Database.loansRequestsLock)
+                {
+                    Database.loansRequests.Insert(0, request);
+                }
+
+                while (request.State == RequestState.WAIT)
+                {
+                    Thread.Sleep(1000);
+                }
+
+                if (request.State == RequestState.PROCCESSED)
+                {
+
+                    Audit.customLog.Source = "UserServices.RaiseALoan";
+                    Audit.UserOperationSuccess("Banking User", "RaiseALoan");
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
                 
             }
 
