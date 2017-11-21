@@ -48,6 +48,8 @@ namespace Common
             } 
             else
             {
+                Audit.customLog.Source = "UserServices.OpenAccount";
+                Audit.UserOperationFailed("Banking User", "OpenAccount", "Request rejected");
                 return -1;
             }
         }
@@ -65,17 +67,32 @@ namespace Common
                 }
 
                 if (CheckIfAccountIsBlocked(account))
+                {
+                    Audit.customLog.Source = "UserServices.Payment";
+                    Audit.UserOperationFailed("Banking User", "Payment", "Account is blocked!");
                     return false;
+                }
+                    
 
                 if (CheckIfRequestsOverload(account))
+                {
+                    Audit.customLog.Source = "UserServices.Payment";
+                    Audit.UserOperationFailed("Banking User", "Payment", "Account is blocked / Server overload");
                     return false;
+                }
 
                 if (account.PIN != pin)
                 {
+                    Audit.customLog.Source = "UserServices.Payment";
+                    Audit.Admin_User_Authentication_Authorization_Failed();
+
                     if (account.LoginAttempts == 3)
                     {
                         account.IsBlocked = true;
                         account.BlockedUntil = DateTime.Now.AddDays(1);
+
+                        Audit.customLog.Source = "UserServices.Payment";
+                        Audit.UserOperationFailed("Banking User", "Payment", "Account is blocked");
                     }
                     else
                     {
@@ -108,6 +125,8 @@ namespace Common
                 }
                 else
                 {
+                    Audit.customLog.Source = "UserServices.Payment";
+                    Audit.UserOperationFailed("Banking User", "Payment", "Request is rejected");
                     return false;
                 }
                 
@@ -132,17 +151,32 @@ namespace Common
                 }
 
                 if (CheckIfAccountIsBlocked(account))
+                {
+                    Audit.customLog.Source = "UserServices.RaiseALoan";
+                    Audit.UserOperationFailed("Banking User", "RaiseALoan", "Account is blocked!");
                     return false;
+                }
+
 
                 if (CheckIfRequestsOverload(account))
-                    return false;
-
-                if (account.PIN!=pin)
                 {
-                    if(account.LoginAttempts==3)
+                    Audit.customLog.Source = "UserServices.RaiseALoan";
+                    Audit.UserOperationFailed("Banking User", "RaiseALoan", "Account is blocked / Server overload");
+                    return false;
+                }
+
+                if (account.PIN != pin)
+                {
+                    Audit.customLog.Source = "UserServices.RaiseALoan";
+                    Audit.Admin_User_Authentication_Authorization_Failed();
+
+                    if (account.LoginAttempts == 3)
                     {
                         account.IsBlocked = true;
                         account.BlockedUntil = DateTime.Now.AddDays(1);
+
+                        Audit.customLog.Source = "UserServices.RaiseALoan";
+                        Audit.UserOperationFailed("Banking User", "Payment", "Account is blocked");
                     }
                     else
                     {
@@ -176,6 +210,8 @@ namespace Common
                 }
                 else
                 {
+                    Audit.customLog.Source = "UserServices.RaiseALoan";
+                    Audit.UserOperationFailed("Banking User", "Payment", "Request is rejected");
                     return false;
                 }
                 
