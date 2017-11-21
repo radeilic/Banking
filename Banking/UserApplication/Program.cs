@@ -20,7 +20,7 @@ namespace UserApplication
             binding.Security.Mode = SecurityMode.Transport;
             binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
             X509Certificate2 srvCert = CertManager.GetCertificateFromStorage(StoreName.TrustedPeople, StoreLocation.LocalMachine, srvCertCN);
-            EndpointAddress address = new EndpointAddress(new Uri("net.tcp://localhost:25001/UserServices"),
+            EndpointAddress address = new EndpointAddress(new Uri("net.tcp://10.1.212.111:25001/UserServices"),
                                       new X509CertificateEndpointIdentity(srvCert));
 
             using (UserProxy proxy = new UserProxy(binding, address))
@@ -106,8 +106,6 @@ namespace UserApplication
 
                 } while (odabir!="4");
             }
-            Console.WriteLine("Press any key to close UserApp.");
-            Console.ReadKey(true);
         }
     }
 }
