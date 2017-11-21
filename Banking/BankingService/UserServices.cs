@@ -72,10 +72,11 @@ namespace Common
 
                 if (account.PIN != pin)
                 {
-                    if (account.LoginAttempts == 3)
+                    if (account.LoginAttempts == 2)
                     {
                         account.IsBlocked = true;
-                        account.BlockedUntil = DateTime.Now.AddDays(1);
+                        account.BlockedUntil = DateTime.Now.AddMinutes(1);
+                        return false;
                     }
                     else
                     {
@@ -139,10 +140,11 @@ namespace Common
 
                 if (account.PIN!=pin)
                 {
-                    if(account.LoginAttempts==3)
+                    if(account.LoginAttempts==2)
                     {
                         account.IsBlocked = true;
-                        account.BlockedUntil = DateTime.Now.AddDays(1);
+                        account.BlockedUntil = DateTime.Now.AddMinutes(1);
+                        return false;
                     }
                     else
                     {
