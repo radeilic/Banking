@@ -68,17 +68,21 @@ namespace BankingService
 
         public bool Init()
         {
-            Audit.customLog.Source = "AdminServices.Init";
-            Audit.Admin_User_Authentication_Authorization_Success();
+            if (Database.accounts == null)
+            {
 
-            Database.accounts = new Dictionary<string, Account>();
-            Database.accountsRequests = new List<Request>();
-            Database.loansRequests = new List<Request>();
-            Database.paymentRequests = new List<Request>();
+                Audit.customLog.Source = "AdminServices.Init";
+                Audit.Admin_User_Authentication_Authorization_Success();
 
-            Audit.customLog.Source = "AdminServices.Init";
-            Audit.AdminOperationSuccess("Init");
+                Database.accounts = new Dictionary<string, Account>();
+                Database.accountsRequests = new List<Request>();
+                Database.loansRequests = new List<Request>();
+                Database.paymentRequests = new List<Request>();
 
+                Audit.customLog.Source = "AdminServices.Init";
+                Audit.AdminOperationSuccess("Init");
+
+            }
             return true;
         }
     }
