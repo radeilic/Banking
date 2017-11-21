@@ -207,6 +207,14 @@ namespace BankingService
                             }
                         }
                     }
+                    else
+                    {
+                        Thread.Sleep(500);
+                    }
+                }
+                else
+                {
+                    Thread.Sleep(500);
                 }
             }
         }
@@ -239,6 +247,14 @@ namespace BankingService
                             }
                         }
                     }
+                    else
+                    {
+                        Thread.Sleep(500);
+                    }
+                }
+                else
+                {
+                    Thread.Sleep(500);
                 }
             }
         }
