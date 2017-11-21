@@ -30,12 +30,12 @@ namespace Common.Services
         /// <summary>
         /// Payment method
         /// </summary>
-        /// <param name="isPayment">If is true than is +payment else is -payment</param>
+        /// <param name="isOutgoing">If is true than is +payment else is -payment</param>
         /// <param name="accountName"></param>
         /// <param name="amount"></param>
         /// <returns></returns>
         [OperationContract]
-        bool Payment(bool isPayment, string accountName, int amount, int pin);
+        bool Payment(bool isOutgoing, string accountName, int amount, int pin);
         
     }
 }

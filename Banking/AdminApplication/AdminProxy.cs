@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Common.Certifications;
 using System.ComponentModel;
+using System.Configuration;
 
 namespace AdminApplication
 {
@@ -18,7 +19,7 @@ namespace AdminApplication
         public AdminProxy(NetTcpBinding binding, EndpointAddress address)
 			: base(binding, address)
 		{
-		    string cltCertCN = "Admin";
+		    string cltCertCN = ConfigurationManager.AppSettings["adminClientCertificationCN"];
 
 		    this.Credentials.ServiceCertificate.Authentication.CertificateValidationMode = System.ServiceModel.Security.X509CertificateValidationMode.ChainTrust;
 		    this.Credentials.ServiceCertificate.Authentication.CustomCertificateValidator = new ClientCertValidator();
@@ -28,39 +29,35 @@ namespace AdminApplication
 		    factory = this.CreateChannel();
         }
 
-        public bool CheckRequest()
+        public void CheckRequest()
         {
             try
             {
-                return factory.CheckRequest();
+                factory.CheckRequest();
             }
             catch (Win32Exception e)
             {
                 Console.WriteLine(e.Message);
-                return false;
             }
             catch (Exception e)
             {
-                Console.WriteLine("Exception in CheckRequest: {0}", e.Message);
-                return false;
+                Console.WriteLine($"Exception in CheckRequest: {e.Message}");
             }
         }
 
-        public bool Init()
+        public void Init()
         {
             try
             {
-                return factory.Init();
+                factory.Init();
             }
             catch (Win32Exception e)
             {
                 Console.WriteLine(e.Message);
-                return false;
             }
             catch (Exception e)
             {
-                Console.WriteLine("Exception in Init: {0}", e.Message);
-                return false;
+                Console.WriteLine($"Exception in Init: {e.Message}");
             }
         }
     }

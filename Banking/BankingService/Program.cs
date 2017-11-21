@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.ServiceModel;
 using System.Text;
@@ -20,19 +21,19 @@ namespace BankingService
     {
         static void Main(string[] args)
         {
-            string srvCertCN = "BankingService";
+            string srvCertCN = ConfigurationManager.AppSettings["serverCertificationCN"];
 
-            NetTcpBinding binding = new NetTcpBinding();
-            string address1 = "net.tcp://localhost:25000/AdminServices";
-            ServiceHost host1 = new ServiceHost(typeof(AdminServices));
-            host1.AddServiceEndpoint(typeof(IAdminServices), binding, address1);
+            NetTcpBinding adminsBinding = new NetTcpBinding();
+            string adminsAddress = ConfigurationManager.AppSettings["adminServicesAddress"];
+            ServiceHost adminsSvcHost = new ServiceHost(typeof(AdminServices));
+            adminsSvcHost.AddServiceEndpoint(typeof(IAdminServices), adminsBinding, adminsAddress);
 
-            binding.Security.Mode = SecurityMode.Transport;
-            binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
-            host1.Credentials.ClientCertificate.Authentication.CertificateValidationMode = X509CertificateValidationMode.ChainTrust;
-            host1.Credentials.ClientCertificate.Authentication.CustomCertificateValidator = new ServiceCertValidator();
-            host1.Credentials.ClientCertificate.Authentication.RevocationMode = X509RevocationMode.NoCheck;
-            host1.Credentials.ServiceCertificate.Certificate = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, srvCertCN);
+            adminsBinding.Security.Mode = SecurityMode.Transport;
+            adminsBinding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
+            adminsSvcHost.Credentials.ClientCertificate.Authentication.CertificateValidationMode = X509CertificateValidationMode.ChainTrust;
+            adminsSvcHost.Credentials.ClientCertificate.Authentication.CustomCertificateValidator = new ServiceCertValidator();
+            adminsSvcHost.Credentials.ClientCertificate.Authentication.RevocationMode = X509RevocationMode.NoCheck;
+            adminsSvcHost.Credentials.ServiceCertificate.Certificate = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, srvCertCN);
 
 
             ServiceSecurityAuditBehavior newAuditAdminService = new ServiceSecurityAuditBehavior();
@@ -41,36 +42,36 @@ namespace BankingService
             newAuditAdminService.ServiceAuthorizationAuditLevel = AuditLevel.SuccessOrFailure;
             newAuditAdminService.SuppressAuditFailure = true;
 
-            host1.Description.Behaviors.Remove<ServiceSecurityAuditBehavior>();
-            host1.Description.Behaviors.Add(newAuditAdminService);
+            adminsSvcHost.Description.Behaviors.Remove<ServiceSecurityAuditBehavior>();
+            adminsSvcHost.Description.Behaviors.Add(newAuditAdminService);
 
             try
             {
-                host1.Open();
+                adminsSvcHost.Open();
                 Console.WriteLine("AdminServices is opened...");
             }
             catch (Exception e)
             {
                 Console.WriteLine($"Error occurred while trying to open host for admins {e.Message}");
                 Console.WriteLine($"[StackTrace] {e.StackTrace}");
-                host1.Close();
+                adminsSvcHost.Close();
 
                 return;
             }
             
 
 
-            NetTcpBinding binding2 = new NetTcpBinding();
-            string address2 = "net.tcp://localhost:25001/UserServices";
-            ServiceHost host2 = new ServiceHost(typeof(UserServices));
-            host2.AddServiceEndpoint(typeof(IUserServices), binding2, address2);
+            NetTcpBinding usersBinding = new NetTcpBinding();
+            string usersAddress = "net.tcp://localhost:25001/UserServices";
+            ServiceHost usersSvcHost = new ServiceHost(typeof(UserServices));
+            usersSvcHost.AddServiceEndpoint(typeof(IUserServices), usersBinding, usersAddress);
 
-            binding2.Security.Mode = SecurityMode.Transport;
-            binding2.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
-            host2.Credentials.ClientCertificate.Authentication.CertificateValidationMode = X509CertificateValidationMode.ChainTrust;
-            host2.Credentials.ClientCertificate.Authentication.CustomCertificateValidator = new ServiceCertValidator();
-            host2.Credentials.ClientCertificate.Authentication.RevocationMode = X509RevocationMode.NoCheck;
-            host2.Credentials.ServiceCertificate.Certificate = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, srvCertCN);
+            usersBinding.Security.Mode = SecurityMode.Transport;
+            usersBinding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
+            usersSvcHost.Credentials.ClientCertificate.Authentication.CertificateValidationMode = X509CertificateValidationMode.ChainTrust;
+            usersSvcHost.Credentials.ClientCertificate.Authentication.CustomCertificateValidator = new ServiceCertValidator();
+            usersSvcHost.Credentials.ClientCertificate.Authentication.RevocationMode = X509RevocationMode.NoCheck;
+            usersSvcHost.Credentials.ServiceCertificate.Certificate = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, srvCertCN);
 
 
             ServiceSecurityAuditBehavior newAuditUserService = new ServiceSecurityAuditBehavior();
@@ -79,20 +80,20 @@ namespace BankingService
             newAuditUserService.ServiceAuthorizationAuditLevel = AuditLevel.SuccessOrFailure;
             newAuditUserService.SuppressAuditFailure = true;
 
-            host2.Description.Behaviors.Remove<ServiceSecurityAuditBehavior>();
-            host2.Description.Behaviors.Add(newAuditUserService);
+            usersSvcHost.Description.Behaviors.Remove<ServiceSecurityAuditBehavior>();
+            usersSvcHost.Description.Behaviors.Add(newAuditUserService);
 
             try
             {
-                host2.Open();
+                usersSvcHost.Open();
                 Console.WriteLine("UserServices is opened...");
             }
             catch (Exception e)
             {
                 Console.WriteLine($"Error occurred while trying to open host for admins {e.Message}");
                 Console.WriteLine($"[StackTrace] {e.StackTrace}");
-                host1.Close();
-                host2.Close();
+                adminsSvcHost.Close();
+                usersSvcHost.Close();
 
                 return;
             }
@@ -107,8 +108,8 @@ namespace BankingService
             Console.WriteLine("Press any key to close server.");
             Console.ReadKey();
 
-            host1.Close();
-            host2.Close();
+            adminsSvcHost.Close();
+            usersSvcHost.Close();
 
             OpenAccountSectorThread.Abort();
             PaymentSectorThread.Abort();
@@ -119,27 +120,27 @@ namespace BankingService
         {
             while (true)
             {
-                if (Database.accountsRequests != null)
+                if (Database.AccountRequests != null)
                 {
-                    lock (Database.accountRequestsLock)
+                    lock (Database.AccountRequestsLock)
                     {
-                        if (Database.accountsRequests.Count > 0)
+                        if (Database.AccountRequests.Count > 0)
                         {
 
-                            Request req = Database.accountsRequests[Database.accountsRequests.Count - 1];
-                            lock (Database.accountsLock)
+                            Request request = Database.AccountRequests[Database.AccountRequests.Count - 1];
+                            lock (Database.AccountsLock)
                             {
-                                Random rand = new Random();
-                                req.Account.PIN = rand.Next(1000, 9999);
-                                Database.accounts.Add(req.Account.AccountName, req.Account);
+                                Random random = new Random();
+                                request.Account.PIN = random.Next(1000, 9999);
+                                Database.Accounts.Add(request.Account.AccountName, request.Account);
                                 Console.WriteLine("Account added.");
-                                Database.accountsRequests.Remove(req);
-                                req.State = RequestState.PROCCESSED;
+                                Database.AccountRequests.Remove(request);
+                                request.State = RequestState.PROCCESSED;
                             }
-
                         }
                     }
-                    if (Database.accountsRequests.Count == 0)
+
+                    if (Database.AccountRequests.Count == 0)
                     {
                         Thread.Sleep(500);
                     }
@@ -155,62 +156,60 @@ namespace BankingService
         {
             while (true)
             {
-                if (Database.paymentRequests != null)
+                if (Database.PaymentRequests != null)
                 {
-                    lock (Database.paymentsRequestsLock)
+                    lock (Database.PaymentRequestsLock)
                     {
-                        if (Database.paymentRequests.Count > 0)
+                        if (Database.PaymentRequests.Count > 0)
                         {
+                            Request request = Database.PaymentRequests[Database.PaymentRequests.Count - 1];
 
-                            Request req = Database.paymentRequests[Database.paymentRequests.Count - 1];
 
-
-                            if (req.IsPayment)
+                            if (request.IsOutgoing)
                             {
-                                lock (Database.accountsLock)
+                                lock (Database.AccountsLock)
                                 {
-                                    req.Account.Amount += req.Amount;
-                                    req.State = RequestState.PROCCESSED;
-                                    Database.paymentRequests.Remove(req);
+                                    request.Account.Amount += request.Amount;
+                                    request.State = RequestState.PROCCESSED;
+                                    Database.PaymentRequests.Remove(request);
                                 }
                             }
                             else
                             {
-                                lock (Database.accountsLock)
+                                lock (Database.AccountsLock)
                                 {
-                                    if (DateTime.Now.Date > req.Account.CurrentDay)
+                                    if (DateTime.Now.Date > request.Account.CurrentDay)
                                     {
-                                        req.Account.CurrentDay = DateTime.Now.Date;
-                                        req.Account.DailyAmount = 0;
+                                        request.Account.CurrentDay = DateTime.Now.Date;
+                                        request.Account.DailyAmount = 0;
                                     }
-                                    else
-                                        if ((req.Account.DailyAmount + req.Amount) > 1000)
+                                    else if ((request.Account.DailyAmount + request.Amount) > Int32.Parse(ConfigurationManager.AppSettings["maxDailyIncomingAmount"]))
                                     {
-                                        req.Account.IsBlocked = true;
-                                        req.Account.BlockedUntil = DateTime.Now.AddDays(1);
+                                        request.Account.IsBlocked = true;
+                                        request.Account.BlockedUntil = DateTime.Now.AddDays(1);
 
-                                        req.State = RequestState.REJECTED;
-                                        Database.paymentRequests.Remove(req);
+                                        request.State = RequestState.REJECTED;
+                                        Database.PaymentRequests.Remove(request);
                                         continue;
                                     }
 
-                                    if (req.Account.Amount >= req.Amount)
+                                    if (request.Account.Amount >= request.Amount)
                                     {
-                                        req.Account.Amount -= req.Amount;
-                                        req.Account.DailyAmount += req.Amount;
-                                        req.State = RequestState.PROCCESSED;
-                                        Database.paymentRequests.Remove(req);
+                                        request.Account.Amount -= request.Amount;
+                                        request.Account.DailyAmount += request.Amount;
+                                        request.State = RequestState.PROCCESSED;
+                                        Database.PaymentRequests.Remove(request);
                                     }
                                     else
                                     {
-                                        req.State = RequestState.REJECTED;
-                                        Database.paymentRequests.Remove(req);
+                                        request.State = RequestState.REJECTED;
+                                        Database.PaymentRequests.Remove(request);
                                     }
                                 }
                             }
                         }
                     }
-                    if (Database.paymentRequests.Count == 0)
+                    if (Database.PaymentRequests.Count == 0)
                     {
                         Thread.Sleep(500);
                     }
@@ -226,33 +225,32 @@ namespace BankingService
         {
             while (true)
             {
-                if (Database.loansRequests != null)
+                if (Database.LoanRequests != null)
                 {
-                    lock (Database.loansRequestsLock)
+                    lock (Database.LoanRequestsLock)
                     {
-                        if (Database.loansRequests.Count > 0)
+                        if (Database.LoanRequests.Count > 0)
                         {
+                            Request request = Database.LoanRequests[Database.LoanRequests.Count - 1];
 
-                            Request req = Database.loansRequests[Database.loansRequests.Count - 1];
-
-                            lock (Database.accountsLock)
+                            lock (Database.AccountsLock)
                             {
-                                if (req.Amount > 0)
+                                if (request.Amount > 0)
                                 {
-                                    req.Account.Amount += req.Amount;
-                                    Database.loansRequests.Remove(req);
-                                    req.State = RequestState.PROCCESSED;
+                                    request.Account.Amount += request.Amount;
+                                    Database.LoanRequests.Remove(request);
+                                    request.State = RequestState.PROCCESSED;
                                 }
                                 else
                                 {
-                                    Database.loansRequests.Remove(req);
-                                    req.State = RequestState.REJECTED;
+                                    Database.LoanRequests.Remove(request);
+                                    request.State = RequestState.REJECTED;
                                 }
                             }
 
                         }
                     }
-                    if (Database.loansRequests.Count == 0)
+                    if (Database.LoanRequests.Count == 0)
                     {
                         Thread.Sleep(500);
                     }

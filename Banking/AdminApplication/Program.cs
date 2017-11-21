@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Principal;
@@ -18,12 +19,12 @@ namespace AdminApplication
         {
             Thread.CurrentPrincipal = new WindowsPrincipal(WindowsIdentity.GetCurrent());
 
-            if (!Thread.CurrentPrincipal.IsInRole(Formatter.FormatName("BankingSystemAdmin")))
+            if (!Thread.CurrentPrincipal.IsInRole(Formatter.FormatName(ConfigurationManager.AppSettings["adminGroupName"])))
             {
                 Console.WriteLine("You don't have permission to use this component.");
 
-                Audit.customLog.Source = "AdminService";
-                Audit.Admin_User_Authentication_Authorization_Failed();
+                Audit.CustomLog.Source = "AdminService";
+                Audit.AdminUserAuthenticationAuthorizationFailed();
 
                 Console.WriteLine("Press any key to exit...");
                 Console.ReadKey(true);
@@ -32,13 +33,13 @@ namespace AdminApplication
             }
 
 
-            string srvCertCN = "BankingService";
+            string srvCertCN = ConfigurationManager.AppSettings["serverCertificationCN"];
 
             NetTcpBinding binding = new NetTcpBinding();
             binding.Security.Mode = SecurityMode.Transport;
             binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
             X509Certificate2 srvCert = CertManager.GetCertificateFromStorage(StoreName.TrustedPeople, StoreLocation.LocalMachine, srvCertCN);
-            EndpointAddress address = new EndpointAddress(new Uri("net.tcp://10.1.212.111:25000/AdminServices"),
+            EndpointAddress address = new EndpointAddress(new Uri(ConfigurationManager.AppSettings["adminServicesAddress"]),
                 new X509CertificateEndpointIdentity(srvCert));
 
             Console.WriteLine("Press any key to close AdminApp.");
@@ -53,7 +54,7 @@ namespace AdminApplication
                     if (Console.KeyAvailable)
                         break;
 
-                    Thread.Sleep(50);
+                    Thread.Sleep(Int32.Parse(ConfigurationManager.AppSettings["requestsCheckIntervalInMiliseconds"]));
                 }
             }
         }
