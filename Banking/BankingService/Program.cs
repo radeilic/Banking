@@ -121,12 +121,12 @@ namespace BankingService
             {
                 if (Database.accountsRequests != null)
                 {
-                    if (Database.accountsRequests.Count > 0)
+                    lock (Database.accountRequestsLock)
                     {
-                        lock (Database.accountRequestsLock)
+                        if (Database.accountsRequests.Count > 0)
                         {
-                            Request req = Database.accountsRequests[Database.accountsRequests.Count - 1];
 
+                            Request req = Database.accountsRequests[Database.accountsRequests.Count - 1];
                             lock (Database.accountsLock)
                             {
                                 Random rand = new Random();
@@ -136,9 +136,10 @@ namespace BankingService
                                 Database.accountsRequests.Remove(req);
                                 req.State = RequestState.PROCCESSED;
                             }
+
                         }
                     }
-                    else
+                    if (Database.accountsRequests.Count == 0)
                     {
                         Thread.Sleep(500);
                     }
@@ -156,11 +157,13 @@ namespace BankingService
             {
                 if (Database.paymentRequests != null)
                 {
-                    if (Database.paymentRequests.Count > 0)
+                    lock (Database.paymentsRequestsLock)
                     {
-                        lock (Database.paymentsRequestsLock)
+                        if (Database.paymentRequests.Count > 0)
                         {
+
                             Request req = Database.paymentRequests[Database.paymentRequests.Count - 1];
+
 
                             if (req.IsPayment)
                             {
@@ -182,14 +185,14 @@ namespace BankingService
                                     }
                                     else
                                         if ((req.Account.DailyAmount + req.Amount) > 1000)
-                                        {
-                                            req.Account.IsBlocked = true;
-                                            req.Account.BlockedUntil = DateTime.Now.AddDays(1);
+                                    {
+                                        req.Account.IsBlocked = true;
+                                        req.Account.BlockedUntil = DateTime.Now.AddDays(1);
 
-                                            req.State = RequestState.REJECTED;
-                                            Database.paymentRequests.Remove(req);
-                                            continue;
-                                        }
+                                        req.State = RequestState.REJECTED;
+                                        Database.paymentRequests.Remove(req);
+                                        continue;
+                                    }
 
                                     if (req.Account.Amount >= req.Amount)
                                     {
@@ -207,6 +210,14 @@ namespace BankingService
                             }
                         }
                     }
+                    if (Database.paymentRequests.Count == 0)
+                    {
+                        Thread.Sleep(500);
+                    }
+                }
+                else
+                {
+                    Thread.Sleep(500);
                 }
             }
         }
@@ -217,10 +228,11 @@ namespace BankingService
             {
                 if (Database.loansRequests != null)
                 {
-                    if (Database.loansRequests.Count > 0)
+                    lock (Database.loansRequestsLock)
                     {
-                        lock (Database.loansRequestsLock)
+                        if (Database.loansRequests.Count > 0)
                         {
+
                             Request req = Database.loansRequests[Database.loansRequests.Count - 1];
 
                             lock (Database.accountsLock)
@@ -237,8 +249,17 @@ namespace BankingService
                                     req.State = RequestState.REJECTED;
                                 }
                             }
+
                         }
                     }
+                    if (Database.loansRequests.Count == 0)
+                    {
+                        Thread.Sleep(500);
+                    }
+                }
+                else
+                {
+                    Thread.Sleep(500);
                 }
             }
         }
