@@ -35,6 +35,7 @@ namespace UserApplication
                     Console.WriteLine("1. Open account");
                     Console.WriteLine("2. Raise a loan");
                     Console.WriteLine("3. Payment");
+                    Console.WriteLine("4. Exit");
                     Console.WriteLine();
                     Console.WriteLine("==================================");
                     odabir = Console.ReadLine();
@@ -42,6 +43,7 @@ namespace UserApplication
                     string accountName = "";
                     string pin = "";
                     string amount = "";
+                    bool res2;
 
                     switch (odabir)
                     {
@@ -66,7 +68,7 @@ namespace UserApplication
                             Console.WriteLine("Enter amount:");
                             amount = Console.ReadLine();
 
-                            bool res2 = proxy.RaiseALoan(accountName, Int32.Parse(amount), Int32.Parse(pin));
+                            res2 = proxy.RaiseALoan(accountName, Int32.Parse(amount), Int32.Parse(pin));
                             if (res2)
                             {
                                 Console.WriteLine("Loan raised.");
@@ -76,9 +78,33 @@ namespace UserApplication
                                 Console.WriteLine("Failed to raise a loan.");
                             }
                             break;
+                        case "3":
+                            Console.WriteLine("Enter account name:");
+                            accountName = Console.ReadLine();
+                            Console.WriteLine("Enter PIN:");
+                            pin = Console.ReadLine();
+                            Console.WriteLine("1 - Pay the money");
+                            Console.WriteLine("2 - Raise the money");
+                            string res3 = Console.ReadLine();
+                            bool choise = res3 == "1" ? true : false;
+                            Console.WriteLine("Enter amount:");
+                            amount = Console.ReadLine();
+
+                            res2 = proxy.Payment(choise, accountName, Int32.Parse(amount),Int32.Parse(pin));
+                            if (res2)
+                            {
+                                Console.WriteLine("Payment done.");
+                            }
+                            else
+                            {
+                                Console.WriteLine("Payment failed.");
+                            }
+                            break;
+                        case "4":
+                            break;
                     }
 
-                } while (odabir != "1" && odabir != "2" && odabir != "3");
+                } while (odabir!="4");
             }
             Console.WriteLine("Press any key to close UserApp.");
             Console.ReadKey(true);
