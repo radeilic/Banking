@@ -38,16 +38,24 @@ namespace AdminApplication
             binding.Security.Mode = SecurityMode.Transport;
             binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
             X509Certificate2 srvCert = CertManager.GetCertificateFromStorage(StoreName.TrustedPeople, StoreLocation.LocalMachine, srvCertCN);
-            EndpointAddress address = new EndpointAddress(new Uri("net.tcp://localhost:25000/AdminServices"),
+            EndpointAddress address = new EndpointAddress(new Uri("net.tcp://10.1.212.111:25000/AdminServices"),
                 new X509CertificateEndpointIdentity(srvCert));
+
+            Console.WriteLine("Press any key to close AdminApp.");
 
             using (AdminProxy proxy = new AdminProxy(binding, address))
             {
                 proxy.Init();
-                proxy.CheckRequest();
+                while(true)
+                {
+                    proxy.CheckRequest();
+
+                    if (Console.KeyAvailable)
+                        break;
+
+                    Thread.Sleep(50);
+                }
             }
-            Console.WriteLine("Press any key to close AdminApp.");
-            Console.ReadKey(true);
         }
     }
 }

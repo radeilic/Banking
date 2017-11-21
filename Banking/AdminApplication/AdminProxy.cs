@@ -8,6 +8,7 @@ using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
 using Common.Certifications;
+using System.ComponentModel;
 
 namespace AdminApplication
 {
@@ -33,6 +34,11 @@ namespace AdminApplication
             {
                 return factory.CheckRequest();
             }
+            catch (Win32Exception e)
+            {
+                Console.WriteLine(e.Message);
+                return false;
+            }
             catch (Exception e)
             {
                 Console.WriteLine("Exception in CheckRequest: {0}", e.Message);
@@ -46,18 +52,16 @@ namespace AdminApplication
             {
                 return factory.Init();
             }
+            catch (Win32Exception e)
+            {
+                Console.WriteLine(e.Message);
+                return false;
+            }
             catch (Exception e)
             {
                 Console.WriteLine("Exception in Init: {0}", e.Message);
                 return false;
             }
         }
-
-        ~AdminProxy()
-        {
-            this.Close();
-        }
-
-
     }
 }
