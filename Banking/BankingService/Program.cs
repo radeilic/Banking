@@ -188,7 +188,7 @@ namespace BankingService
 
                                             req.State = RequestState.REJECTED;
                                             Database.paymentRequests.Remove(req);
-                                            break;
+                                            continue;
                                         }
 
                                     if (req.Account.Amount >= req.Amount)
@@ -207,6 +207,14 @@ namespace BankingService
                             }
                         }
                     }
+                    else
+                    {
+                        Thread.Sleep(500);
+                    }
+                }
+                else
+                {
+                    Thread.Sleep(500);
                 }
             }
         }
@@ -239,6 +247,14 @@ namespace BankingService
                             }
                         }
                     }
+                    else
+                    {
+                        Thread.Sleep(500);
+                    }
+                }
+                else
+                {
+                    Thread.Sleep(500);
                 }
             }
         }
