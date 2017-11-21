@@ -36,7 +36,8 @@ namespace UserApplication
                     Console.WriteLine("1. Open account");
                     Console.WriteLine("2. Raise a loan");
                     Console.WriteLine("3. Payment");
-                    Console.WriteLine("4. Exit");
+                    Console.WriteLine("4. Test overload");
+                    Console.WriteLine("5. Exit");
                     Console.WriteLine();
                     Console.WriteLine("==================================");
                     Console.WriteLine();
@@ -103,10 +104,21 @@ namespace UserApplication
                             }
                             break;
                         case "4":
+                            int result = proxy.OpenAccount("Test Account");
+
+                            for(int i=0; i < 11; ++i)
+                            {
+                                if (proxy.Payment(true, "Test Account", 100, result))
+                                    Console.WriteLine($"Attempt {i + 1} succeeded");
+                                else
+                                    Console.WriteLine($"Attempt {i + 1} failed");
+
+                            }
+
                             break;
                     }
 
-                } while (odabir!="4");
+                } while (odabir!="5");
             }
         }
     }
