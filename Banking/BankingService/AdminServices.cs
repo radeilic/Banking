@@ -13,6 +13,9 @@ namespace BankingService
     {
         public bool CheckRequest()
         {
+            Audit.customLog.Source = "AdminServices.Init";
+            Audit.Admin_User_Authentication_Authorization_Success();
+
             lock (Database.accountRequestsLock)
             {
                 for (int i = 0;i < Database.accountsRequests.Count; i++)
@@ -64,10 +67,14 @@ namespace BankingService
         {
             if (Database.accounts == null)
             {
-                Database.accounts = new Dictionary<string, Account>();
-                Database.accountsRequests = new List<Request>();
-                Database.loansRequests = new List<Request>();
-                Database.paymentRequests = new List<Request>();
+
+            Audit.customLog.Source = "AdminServices.Init";
+            Audit.Admin_User_Authentication_Authorization_Success();
+
+            Database.accounts = new Dictionary<string, Account>();
+            Database.accountsRequests = new List<Request>();
+            Database.loansRequests = new List<Request>();
+            Database.paymentRequests = new List<Request>();
 
                 Audit.customLog.Source = "AdminServices.Init";
                 Audit.AdminOperationSuccess("Init");
