@@ -67,6 +67,24 @@ namespace Common
                 if (CheckIfAccountIsBlocked(account))
                     return false;
 
+                if (CheckIfRequestsOverload(account))
+                    return false;
+
+                if (account.PIN != pin)
+                {
+                    if (account.LoginAttempts == 3)
+                    {
+                        account.IsBlocked = true;
+                        account.BlockedUntil = DateTime.Now.AddDays(1);
+                    }
+                    else
+                    {
+                        account.LoginAttempts++;
+                        return false;
+                    }
+                }
+
+                account.LoginAttempts = 0;
                 DateTime now = DateTime.Now;
 
                 //true is for + payment
@@ -115,8 +133,11 @@ namespace Common
 
                 if (CheckIfAccountIsBlocked(account))
                     return false;
-                
-                if(account.PIN!=pin)
+
+                if (CheckIfRequestsOverload(account))
+                    return false;
+
+                if (account.PIN!=pin)
                 {
                     if(account.LoginAttempts==3)
                     {
@@ -130,7 +151,7 @@ namespace Common
                     }
                 }
 
-                Database.accounts[accountName].LoginAttempts = 0;
+                account.LoginAttempts = 0;
                 DateTime now = DateTime.Now;
 
                 //true is for + payment
@@ -167,11 +188,39 @@ namespace Common
 
         public bool CheckIfAccountIsBlocked(Account account)
         {
-            if (account.IsBlocked)
-                if (DateTime.Now > account.BlockedUntil)
-                    account.IsBlocked = false;
+            lock (account)
+            {
+                if (account.IsBlocked)
+                    if (DateTime.Now > account.BlockedUntil)
+                        account.IsBlocked = false;
 
-            return account.IsBlocked;
+                return account.IsBlocked;
+            }
+        }
+
+        public bool CheckIfRequestsOverload(Account account)
+        {
+            bool retVal = false;
+
+            lock (account)
+            {
+                if (account.IntevalBeginning == null || account.IntevalBeginning > DateTime.Now.AddSeconds(30))
+                {
+                    account.IntevalBeginning = DateTime.Now;
+                    account.RequestsCount = 1;
+                }
+                else if (account.RequestsCount + 1 > 10)
+                {
+                    account.IsBlocked = true;
+                    account.BlockedUntil = DateTime.Now.AddDays(1);
+                    account.IntevalBeginning = null;
+                    retVal = true;
+                }
+                else
+                    ++account.RequestsCount;
+            }
+
+            return retVal;
         }
     }
 }
