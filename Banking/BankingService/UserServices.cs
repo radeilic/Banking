@@ -70,6 +70,21 @@ namespace Common
                 if (CheckIfRequestsOverload(account))
                     return false;
 
+                if (account.PIN != pin)
+                {
+                    if (account.LoginAttempts == 3)
+                    {
+                        account.IsBlocked = true;
+                        account.BlockedUntil = DateTime.Now.AddDays(1);
+                    }
+                    else
+                    {
+                        account.LoginAttempts++;
+                        return false;
+                    }
+                }
+
+                account.LoginAttempts = 0;
                 DateTime now = DateTime.Now;
 
                 //true is for + payment
@@ -136,7 +151,7 @@ namespace Common
                     }
                 }
 
-                Database.accounts[accountName].LoginAttempts = 0;
+                account.LoginAttempts = 0;
                 DateTime now = DateTime.Now;
 
                 //true is for + payment
