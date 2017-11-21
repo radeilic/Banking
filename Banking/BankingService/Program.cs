@@ -162,6 +162,7 @@ namespace BankingService
                         {
                             Request req = Database.paymentRequests[Database.paymentRequests.Count - 1];
 
+
                             if (req.IsPayment)
                             {
                                 lock (Database.accountsLock)
