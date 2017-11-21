@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Common.Certifications;
+using Common.Auditing;
 
 namespace AdminApplication
 {
@@ -20,6 +21,10 @@ namespace AdminApplication
             if (!Thread.CurrentPrincipal.IsInRole(Formatter.FormatName("BankingSystemAdmin")))
             {
                 Console.WriteLine("You don't have permission to use this component.");
+
+                Audit.customLog.Source = "AdminService";
+                Audit.Admin_User_Authentication_Authorization_Failed();
+
                 Console.WriteLine("Press any key to exit...");
                 Console.ReadKey(true);
 

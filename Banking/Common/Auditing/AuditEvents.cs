@@ -13,7 +13,9 @@ namespace Common.Auditing
         UserOperationFailed = 0,
         UserOperationSuccess = 1,
         AdminOperationFailed = 2,
-        AdminOperationSuccess = 4
+        AdminOperationSuccess = 4,
+        Admin_User_Authentication_Authorization_Success = 5,
+        Admin_User_Authentication_Authorization_Fail = 6
     }
 
     public class AuditEvents
@@ -65,6 +67,22 @@ namespace Common.Auditing
             get
             {
                 return ResourceMgr.GetString(AuditEventTypes.AdminOperationSuccess.ToString());
+            }
+        }
+
+        public static string Admin_User_Authentication_Authorization_Success
+        {
+            get
+            {
+                return ResourceMgr.GetString(AuditEventTypes.Admin_User_Authentication_Authorization_Success.ToString());
+            }
+        }
+
+        public static string Admin_User_Authentication_Authorization_Fail
+        {
+            get
+            {
+                return ResourceMgr.GetString(AuditEventTypes.Admin_User_Authentication_Authorization_Fail.ToString());
             }
         }
     }
