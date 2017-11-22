@@ -59,6 +59,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Request.cs" />
     <Compile Include="RequestState.cs" />
+    <Compile Include="RequestType.cs" />
     <Compile Include="Services\IAdminServices.cs" />
     <Compile Include="Services\IUserServices.cs" />
   </ItemGroup>
