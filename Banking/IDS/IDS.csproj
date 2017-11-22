@@ -4,15 +4,17 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{A8C3C87B-DFDD-46B4-B39E-5F63C152FE6B}</ProjectGuid>
-    <OutputType>Library</OutputType>
+    <ProjectGuid>{D648FDC7-10D3-435A-ACB9-BF6741CFCCC5}</ProjectGuid>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Common</RootNamespace>
-    <AssemblyName>Common</AssemblyName>
+    <RootNamespace>IDS</RootNamespace>
+    <AssemblyName>IDS</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -22,6 +24,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -31,9 +34,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
-    <Reference Include="System.IdentityModel" />
-    <Reference Include="System.IdentityModel.Selectors" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -43,31 +45,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Account.cs" />
-    <Compile Include="Auditing\Audit.cs" />
-    <Compile Include="Auditing\AuditEvents.cs" />
-    <Compile Include="Auditing\AuditEventsFile.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>AuditEventsFile.resx</DependentUpon>
-    </Compile>
-    <Compile Include="Certifications\CertManager.cs" />
-    <Compile Include="Certifications\ClientCertValidator.cs" />
-    <Compile Include="Certifications\Formatter.cs" />
-    <Compile Include="Certifications\ServiceCertValidator.cs" />
-    <Compile Include="Database.cs" />
+    <Compile Include="BankingServiceIDS.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Request.cs" />
-    <Compile Include="RequestState.cs" />
-    <Compile Include="Services\IAdminServices.cs" />
-    <Compile Include="Services\IBankingService.cs" />
-    <Compile Include="Services\IUserServices.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Auditing\AuditEventsFile.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>AuditEventsFile.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Common\Common.csproj">
+      <Project>{A8C3C87B-DFDD-46B4-B39E-5F63C152FE6B}</Project>
+      <Name>Common</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
