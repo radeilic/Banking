@@ -198,9 +198,10 @@ namespace BankingService
                                         request.Account.CurrentDay = DateTime.Now.Date;
                                         request.Account.DailyAmount = 0;
                                     }
-                                    
 
-                                    request.State = RequestState.REJECTED;
+                                    request.Account.Amount -= request.Amount;
+                                    request.Account.DailyAmount += request.Amount;
+                                    request.State = RequestState.PROCCESSED;
                                     Database.PaymentRequests.Remove(request);
 
                                     Audit.CustomLog.Source = "UserServices.Payment";
@@ -235,7 +236,7 @@ namespace BankingService
                             IDSResult idsResult = proxy.Check(request);
 
                             if (!CheckIDSResult(idsResult, request))
-                                break;
+                                continue;
 
                             lock (Database.AccountsLock)
                             {

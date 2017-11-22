@@ -35,6 +35,7 @@ namespace IDS
                         return IDSResult.BlockForWrongPIN;
                     }
 
+                    Console.WriteLine("Payment failed.");
                     request.Account.LoginAttempts++;
                     return IDSResult.FailedPayment;
                 }
@@ -60,13 +61,11 @@ namespace IDS
                         request.Account.Amount -= request.Amount;
                         request.Account.DailyAmount += request.Amount;
 
-                        request.State = RequestState.PROCCESSED;
                         Console.WriteLine("Payment done!");
                         return IDSResult.OK;
                     }
                     else
                     {
-                        request.State = RequestState.PROCCESSED;
                         Console.ForegroundColor = ConsoleColor.Red;
                         Console.WriteLine("Payment failed.");
                         Console.ForegroundColor = ConsoleColor.White;
@@ -108,7 +107,7 @@ namespace IDS
 
             }
             
-            Console.WriteLine("Ne treba ovde da dodje!");
+            Console.WriteLine("Payment outgoing done!");
             return IDSResult.OK;
         }
 
@@ -120,15 +119,22 @@ namespace IDS
             {
                 if (account.IntevalBeginning == null || account.IntevalBeginning > DateTime.Now.AddSeconds(Int32.Parse(ConfigurationManager.AppSettings["requestsOverloadCheckInterval"])))
                 {
-                    account.IntevalBeginning = DateTime.Now;
+                    Console.WriteLine("prvi "+account.IntevalBeginning);
+                    Console.WriteLine("drugi "+ DateTime.Now.AddSeconds(Int32.Parse(ConfigurationManager.AppSettings["requestsOverloadCheckInterval"])));
+                    Database.Accounts[account.AccountName].IntevalBeginning = DateTime.Now;
                     account.RequestsCount = 1;
                 }
-                else if (account.RequestsCount + 1 > Int32.Parse(ConfigurationManager.AppSettings["requestsOverloadLimit"]))
+                else if (account.RequestsCount + 1 >
+                         Int32.Parse(ConfigurationManager.AppSettings["requestsOverloadLimit"]))
                 {
+                    Console.WriteLine("else if");
                     retVal = true;
                 }
                 else
+                {
+                    Console.WriteLine("else");
                     ++account.RequestsCount;
+                }
             }
 
             return retVal;
