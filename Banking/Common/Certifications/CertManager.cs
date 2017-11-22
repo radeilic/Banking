@@ -16,11 +16,11 @@ namespace Common.Certifications
 
             X509Certificate2Collection certCollection = store.Certificates.Find(X509FindType.FindBySubjectName, subjectName, true);
 
-            foreach (X509Certificate2 c in certCollection)
+            foreach (X509Certificate2 certificate in certCollection)
             {
-                if (c.SubjectName.Name.Equals(string.Format("CN={0}", subjectName)))
+                if (certificate.SubjectName.Name.Equals($"CN={subjectName}"))
                 {
-                    return c;
+                    return certificate;
                 }
             }
 

@@ -3,6 +3,7 @@ using Common.Services;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Configuration;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Principal;
@@ -19,7 +20,7 @@ namespace UserApplication
         public UserProxy(NetTcpBinding binding, EndpointAddress address)
 			: base(binding, address)
 		{
-            string cltCertCN = "User";
+            string cltCertCN = ConfigurationManager.AppSettings["userCertificationCN"];
 
             this.Credentials.ServiceCertificate.Authentication.CertificateValidationMode = System.ServiceModel.Security.X509CertificateValidationMode.ChainTrust;
             this.Credentials.ServiceCertificate.Authentication.CustomCertificateValidator = new ClientCertValidator();
@@ -42,17 +43,17 @@ namespace UserApplication
             }
             catch (Exception e)
             {
-                Console.WriteLine("Exception in OpenAccount: {0}",e.Message);
+                Console.WriteLine($"Exception in OpenAccount: {e.Message}");
                 return -1;
             }
             
         }
 
-        public bool Payment(bool isPayment,string accountName, int amount, int pin)
+        public bool Payment(bool isOutgoing,string accountName, int amount, int pin)
         {
             try
             {
-                return factory.Payment(isPayment, accountName, amount, pin);
+                return factory.Payment(isOutgoing, accountName, amount, pin);
             }
             catch (Win32Exception e)
             {
@@ -61,7 +62,7 @@ namespace UserApplication
             }
             catch (Exception e)
             {
-                Console.WriteLine("Exception in Payment: {0}", e.Message);
+                Console.WriteLine($"Exception in Payment: {e.Message}");
                 return false;
             }
         }
@@ -79,7 +80,7 @@ namespace UserApplication
             }
             catch (Exception e)
             {
-                Console.WriteLine("Exception in RaiseALoan: {0}", e.Message);
+                Console.WriteLine($"Exception in RaiseALoan: {e.Message}");
                 return false;
             }
         }
