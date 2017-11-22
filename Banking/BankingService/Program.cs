@@ -62,7 +62,7 @@ namespace BankingService
 
 
             NetTcpBinding usersBinding = new NetTcpBinding();
-            string usersAddress = "net.tcp://localhost:25001/UserServices";
+            string usersAddress = ConfigurationManager.AppSettings["userServicesAddress"];
             ServiceHost usersSvcHost = new ServiceHost(typeof(UserServices));
             usersSvcHost.AddServiceEndpoint(typeof(IUserServices), usersBinding, usersAddress);
 
@@ -190,6 +190,9 @@ namespace BankingService
 
                                         request.State = RequestState.REJECTED;
                                         Database.PaymentRequests.Remove(request);
+
+                                        Audit.CustomLog.Source = "UserServices.Payment";
+                                        Audit.UserOperationFailed(request.Account.Owner, "Payment", "Daily limit reached");
                                         continue;
                                     }
 
@@ -204,6 +207,9 @@ namespace BankingService
                                     {
                                         request.State = RequestState.REJECTED;
                                         Database.PaymentRequests.Remove(request);
+
+                                        Audit.CustomLog.Source = "UserServices.Payment";
+                                        Audit.UserOperationFailed(request.Account.Owner, "Payment", "Insufficient funds");
                                     }
                                 }
                             }
@@ -245,6 +251,9 @@ namespace BankingService
                                 {
                                     Database.LoanRequests.Remove(request);
                                     request.State = RequestState.REJECTED;
+
+                                    Audit.CustomLog.Source = "UserServices.RaiseALoan";
+                                    Audit.UserOperationFailed(request.Account.Owner, "RaiseALoan", "Invalid value to raise");
                                 }
                             }
 

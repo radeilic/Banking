@@ -126,7 +126,7 @@
   <data name="AdminUserAuthenticationAuthorizationFail" xml:space="preserve">
     <value>Admin or User unsuccessfully  authentificated or authorized.</value>
   </data>
-  <data name="AdminUser_AuthenticationAuthorizationSuccess" xml:space="preserve">
+  <data name="AdminUserAuthenticationAuthorizationSuccess" xml:space="preserve">
     <value>Admin or User successfully  authentificated or authorized.</value>
   </data>
   <data name="UserOperationFailed" xml:space="preserve">

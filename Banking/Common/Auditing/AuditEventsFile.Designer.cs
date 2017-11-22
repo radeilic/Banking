@@ -19,7 +19,7 @@ namespace Common.Auditing {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class AuditEventsFile {
@@ -79,20 +79,20 @@ namespace Common.Auditing {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Admin or User successfully  authentificated or authorized..
-        /// </summary>
-        internal static string AdminUser_AuthenticationAuthorizationSuccess {
-            get {
-                return ResourceManager.GetString("AdminUser_AuthenticationAuthorizationSuccess", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Admin or User unsuccessfully  authentificated or authorized..
         /// </summary>
         internal static string AdminUserAuthenticationAuthorizationFail {
             get {
                 return ResourceManager.GetString("AdminUserAuthenticationAuthorizationFail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Admin or User successfully  authentificated or authorized..
+        /// </summary>
+        internal static string AdminUserAuthenticationAuthorizationSuccess {
+            get {
+                return ResourceManager.GetString("AdminUserAuthenticationAuthorizationSuccess", resourceCulture);
             }
         }
         

@@ -42,6 +42,7 @@ namespace AdminApplication
             catch (Exception e)
             {
                 Console.WriteLine($"Exception in CheckRequest: {e.Message}");
+                throw;
             }
         }
 

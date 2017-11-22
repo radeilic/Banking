@@ -5,18 +5,20 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
 using System.Security.Principal;
+using System.ServiceModel;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Common
 {
+    [ServiceBehavior(ConcurrencyMode = ConcurrencyMode.Multiple)]
     public class UserServices : IUserServices
     {
         /// <inheritdoc />
         public int OpenAccount(string accountName)
         {
-            string owner = WindowsIdentity.GetCurrent().Name;
+            string owner = Thread.CurrentPrincipal.Identity.Name;
             Account account = new Account(owner, accountName);
 
             if(Database.Accounts.ContainsKey(accountName))
@@ -24,7 +26,7 @@ namespace Common
                 Console.WriteLine("Account already in use!");
 
                 Audit.CustomLog.Source = "UserServices.OpenAccount";
-                Audit.UserOperationFailed("Banking User", "OpenAccount", "Account already in use!");
+                Audit.UserOperationFailed(Thread.CurrentPrincipal.Identity.Name, "OpenAccount", "Account already in use!");
                 return -1;
             }
 
@@ -44,13 +46,11 @@ namespace Common
             if(request.State==RequestState.PROCCESSED)
             {
                 Audit.CustomLog.Source = "UserServices.OpenAccount";
-                Audit.UserOperationSuccess("Banking User", "OpenAccount");
+                Audit.UserOperationSuccess(Thread.CurrentPrincipal.Identity.Name, "OpenAccount");
                 return request.Account.PIN;
             } 
             else
             {
-                Audit.CustomLog.Source = "UserServices.OpenAccount";
-                Audit.UserOperationFailed("Banking User", "OpenAccount", "Request rejected");
                 return -1;
             }
         }
@@ -70,36 +70,33 @@ namespace Common
                 if (CheckIfAccountIsBlocked(account))
                 {
                     Audit.CustomLog.Source = "UserServices.Payment";
-                    Audit.UserOperationFailed("Banking User", "Payment", "Account is blocked!");
+                    Audit.UserOperationFailed(account.Owner, "Payment", "Account is blocked!");
                     return false;
                 }
 
                 if (CheckIfRequestsOverload(account))
                 {
                     Audit.CustomLog.Source = "UserServices.Payment";
-                    Audit.UserOperationFailed("Banking User", "Payment", "Server overload");
+                    Audit.UserOperationFailed(account.Owner, "Payment", "Server overload");
                     return false;
                 }
 
                 if (account.PIN != pin)
                 {
-                    Audit.CustomLog.Source = "UserServices.Payment";
-                    Audit.AdminUserAuthenticationAuthorizationFailed();
-
                     if (account.LoginAttempts == Int32.Parse(ConfigurationManager.AppSettings["wrongPinAttemptsLimit"])-1)
                     {
                         account.IsBlocked = true;
                         account.BlockedUntil = DateTime.Now.AddMinutes(Int32.Parse(ConfigurationManager.AppSettings["minutesLockForWrongPin"]));
 
                         Audit.CustomLog.Source = "UserServices.Payment";
-                        Audit.UserOperationFailed("Banking User", "Payment", "Account is blocked");
+                        Audit.UserOperationFailed(account.Owner, "Payment", "Account is blocked");
                         return false;
                     }
 
                     account.LoginAttempts++;
 
                     Audit.CustomLog.Source = "UserServices.Payment";
-                    Audit.UserOperationFailed("Banking User", "Payment", "Wrong PIN");
+                    Audit.UserOperationFailed(account.Owner, "Payment", "Wrong PIN");
                     return false;
                 }
 
@@ -122,20 +119,18 @@ namespace Common
                 if (request.State == RequestState.PROCCESSED)
                 {
                     Audit.CustomLog.Source = "UserServices.Payment";
-                    Audit.UserOperationSuccess("Banking User", "Payment");
+                    Audit.UserOperationSuccess(account.Owner, "Payment");
                     return true;
                 }
                 else
                 {
-                    Audit.CustomLog.Source = "UserServices.Payment";
-                    Audit.UserOperationFailed("Banking User", "Payment", "Request is rejected");
                     return false;
                 }
                 
             }
 
             Audit.CustomLog.Source = "UserServices.Payment";
-            Audit.UserOperationFailed("Banking User", "Payment", "No account information in database");
+            Audit.UserOperationFailed(Thread.CurrentPrincipal.Identity.Name, "Payment", "No account information in database");
             return false;
 
         }
@@ -155,36 +150,33 @@ namespace Common
                 if (CheckIfAccountIsBlocked(account))
                 {
                     Audit.CustomLog.Source = "UserServices.RaiseALoan";
-                    Audit.UserOperationFailed("Banking User", "RaiseALoan", "Account is blocked!");
+                    Audit.UserOperationFailed(account.Owner, "RaiseALoan", "Account is blocked!");
                     return false;
                 }
 
                 if (CheckIfRequestsOverload(account))
                 {
                     Audit.CustomLog.Source = "UserServices.RaiseALoan";
-                    Audit.UserOperationFailed("Banking User", "RaiseALoan", "Server overload");
+                    Audit.UserOperationFailed(account.Owner, "RaiseALoan", "Server overload");
                     return false;
                 }
 
                 if (account.PIN != pin)
                 {
-                    Audit.CustomLog.Source = "UserServices.RaiseALoan";
-                    Audit.AdminUserAuthenticationAuthorizationFailed();
-
                     if(account.LoginAttempts == Int32.Parse(ConfigurationManager.AppSettings["wrongPinAttemptsLimit"])-1)
                     {
                         account.IsBlocked = true;
                         account.BlockedUntil = DateTime.Now.AddMinutes(Int32.Parse(ConfigurationManager.AppSettings["minutesLockForWrongPin"]));
 
                         Audit.CustomLog.Source = "UserServices.RaiseALoan";
-                        Audit.UserOperationFailed("Banking User", "Payment", "Account is blocked");
+                        Audit.UserOperationFailed(account.Owner, "Payment", "Account is blocked");
                         return false;
                     }
 
                     account.LoginAttempts++;
 
                     Audit.CustomLog.Source = "UserServices.RaiseALoan";
-                    Audit.UserOperationFailed("Banking User", "Payment", "Wrong PIN");
+                    Audit.UserOperationFailed(account.Owner, "Payment", "Wrong PIN");
                     return false;
                 }
 
@@ -208,20 +200,18 @@ namespace Common
                 {
 
                     Audit.CustomLog.Source = "UserServices.RaiseALoan";
-                    Audit.UserOperationSuccess("Banking User", "RaiseALoan");
+                    Audit.UserOperationSuccess(account.Owner, "RaiseALoan");
                     return true;
                 }
                 else
                 {
-                    Audit.CustomLog.Source = "UserServices.RaiseALoan";
-                    Audit.UserOperationFailed("Banking User", "Payment", "Request is rejected");
                     return false;
                 }
                 
             }
 
             Audit.CustomLog.Source = "UserServices.RaiseALoan";
-            Audit.UserOperationFailed("Banking User", "RaiseALoan", "No account information in database");
+            Audit.UserOperationFailed(Thread.CurrentPrincipal.Identity.Name, "RaiseALoan", "No account information in database");
             return false;
         }
 

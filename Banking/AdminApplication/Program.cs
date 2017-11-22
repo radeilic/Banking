@@ -22,13 +22,8 @@ namespace AdminApplication
             if (!Thread.CurrentPrincipal.IsInRole(Formatter.FormatName(ConfigurationManager.AppSettings["adminGroupName"])))
             {
                 Console.WriteLine("You don't have permission to use this component.");
-
-                Audit.CustomLog.Source = "AdminService";
-                Audit.AdminUserAuthenticationAuthorizationFailed();
-
                 Console.WriteLine("Press any key to exit...");
                 Console.ReadKey(true);
-
                 return;
             }
 

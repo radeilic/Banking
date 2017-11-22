@@ -5,11 +5,13 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
+using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace BankingService
 {
+    [ServiceBehavior(ConcurrencyMode = ConcurrencyMode.Multiple)]
     public class AdminServices : IAdminServices
     {
         public void CheckRequest()
@@ -31,6 +33,9 @@ namespace BankingService
                         Database.AccountRequests[i].State = RequestState.REJECTED;
                         Database.AccountRequests.RemoveAt(i);
                         --i;
+
+                        Audit.CustomLog.Source = "AdminServices.CheckRequest";
+                        Audit.AdminOperationSuccess("CheckRequest");
                     }
                 }
             }
@@ -47,6 +52,9 @@ namespace BankingService
                         Database.LoanRequests[i].State = RequestState.REJECTED;
                         Database.LoanRequests.RemoveAt(i);
                         --i;
+
+                        Audit.CustomLog.Source = "AdminServices.CheckRequest";
+                        Audit.AdminOperationSuccess("CheckRequest");
                     }
                 }
             }
@@ -63,6 +71,9 @@ namespace BankingService
                         Database.PaymentRequests[i].State = RequestState.REJECTED;
                         Database.PaymentRequests.RemoveAt(i);
                         --i;
+
+                        Audit.CustomLog.Source = "AdminServices.CheckRequest";
+                        Audit.AdminOperationSuccess("CheckRequest");
                     }
                 }
             }
