@@ -9,6 +9,8 @@ namespace Common
     public enum IDSResult
     {
         OK,
+        FailedLoan,
+        FailedPayment,
         BlockForOverload,
         BlockForWrongPIN,
         BlockForDailyLimit,

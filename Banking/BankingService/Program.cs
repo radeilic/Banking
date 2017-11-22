@@ -318,6 +318,23 @@ namespace BankingService
 
                     Audit.CustomLog.Source = "UserServices.Payment";
                     Audit.UserOperationFailed(request.Account.Owner, "Payment", "Wrong PIN");
+                    retVal = false;
+                    break;
+                case IDSResult.FailedPayment:
+                    request.State = RequestState.REJECTED;
+                    Database.PaymentRequests.Remove(request);
+
+                    Audit.CustomLog.Source = "UserServices.Payment";
+                    Audit.UserOperationFailed(request.Account.Owner, "Payment", "Wrong PIN");
+
+                    retVal = false;
+                    break;
+                case IDSResult.FailedLoan:
+                    request.State = RequestState.REJECTED;
+                    Database.LoanRequests.Remove(request);
+
+                    Audit.CustomLog.Source = "UserServices.RaiseALoan";
+                    Audit.UserOperationFailed(request.Account.Owner, "RaiseALoan", "Wrong PIN");
 
                     retVal = false;
                     break;
@@ -328,7 +345,6 @@ namespace BankingService
                     retVal = false;
                     break;
                 case IDSResult.OK:
-
                     retVal = true;
                     break;
             }

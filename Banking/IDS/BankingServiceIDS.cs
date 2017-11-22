@@ -11,7 +11,7 @@ namespace IDS
 {
     public class BankingServiceIDS : IBankingService
     {
-        public bool Check(Request request, int pin)
+        public IDSResult Check(Request request, int pin)
         {
             if(request.Type==RequestType.Payment)
             {
@@ -21,7 +21,7 @@ namespace IDS
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine("Payment failed.");
                     Console.ForegroundColor = ConsoleColor.White;
-                    return true;
+                    return IDSResult.BlockForOverload;
                 }
 
                 if (request.Account.PIN != pin)
@@ -32,11 +32,15 @@ namespace IDS
                         Console.ForegroundColor = ConsoleColor.Red;
                         Console.WriteLine("Payment failed.");
                         Console.ForegroundColor = ConsoleColor.White;
-                        return true;
+                        return IDSResult.BlockForWrongPIN;
                     }
 
                     request.Account.LoginAttempts++;
-                   
+                    return IDSResult.FailedPayment;
+                }
+                else
+                {
+                    request.Account.LoginAttempts = 0;
                 }
 
                 if (!request.IsOutgoing)
@@ -46,13 +50,13 @@ namespace IDS
                         Console.ForegroundColor = ConsoleColor.Red;
                         Console.WriteLine("Raise a loan failed.");
                         Console.ForegroundColor = ConsoleColor.White;
-                        return true;
+                        return IDSResult.BlockForDailyLimit;
                     }
                     
                 }
 
                 Console.WriteLine("Payment done!");
-                return false;
+                return IDSResult.OK;
             }
             else if(request.Type==RequestType.RaiseALoan)
             {
@@ -61,7 +65,7 @@ namespace IDS
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine("Raise a loan failed.");
                     Console.ForegroundColor = ConsoleColor.White;
-                    return true;
+                    return IDSResult.BlockForOverload;
                 }
 
                 if (request.Account.PIN != pin)
@@ -71,19 +75,24 @@ namespace IDS
                         Console.ForegroundColor = ConsoleColor.Red;
                         Console.WriteLine("Raise a loan failed.");
                         Console.ForegroundColor = ConsoleColor.White;
-                        return true;
+                        return IDSResult.BlockForWrongPIN;
                     }
 
                     request.Account.LoginAttempts++;
-                    Console.WriteLine("Raise a loan done!");
-                    return false;
+                    Console.WriteLine("Raise a loan failed!");
+                    return IDSResult.FailedLoan;
+                }
+                else
+                {
+                    request.Account.LoginAttempts = 0;
+                    return IDSResult.OK;
                 }
 
-               
+
             }
             
-            Console.WriteLine("");
-            return false;
+            Console.WriteLine("Ne treba ovde da dodje!");
+            return IDSResult.OK;
         }
 
         public bool CheckIfRequestsOverload(Account account)
