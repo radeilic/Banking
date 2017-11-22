@@ -22,7 +22,7 @@ namespace IDS
             try
             {
                 adminsSvcHost.Open();
-                Console.WriteLine("AdminServices is opened...");
+                Console.WriteLine("IDSServices is opened...");
             }
             catch (Exception e)
             {
