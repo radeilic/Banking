@@ -193,16 +193,9 @@ namespace BankingService
                             {
                                 lock (Database.AccountsLock)
                                 {
-                                    if (DateTime.Now.Date > request.Account.CurrentDay)
-                                    {
-                                        request.Account.CurrentDay = DateTime.Now.Date;
-                                        request.Account.DailyAmount = 0;
-                                    }
-
                                     if (request.Account.Amount >= request.Amount)
                                     {
                                         request.Account.Amount -= request.Amount;
-                                        request.Account.DailyAmount += request.Amount;
                                         request.State = RequestState.PROCCESSED;
                                         Database.PaymentRequests.Remove(request);
                                     }
@@ -299,7 +292,6 @@ namespace BankingService
                 case IDSResult.BlockForOverload:
                     request.Account.IsBlocked = true;
                     request.Account.BlockedUntil = DateTime.Now.AddDays(Int32.Parse(ConfigurationManager.AppSettings["daysLockForOverload"]));
-                    request.Account.IntevalBeginning = null;
 
                     request.State = RequestState.REJECTED;
                     Database.PaymentRequests.Remove(request);

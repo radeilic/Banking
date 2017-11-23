@@ -13,46 +13,72 @@ namespace IDS
     {
         public IDSResult Check(Request request)
         {
-            if(request.Type==RequestType.Payment)
+            AccountIDS account;
+
+            if(!DatabaseIDS.Accounts.ContainsKey(request.Account.AccountName))
+            {
+                account = new AccountIDS(request.Account.AccountName);
+                DatabaseIDS.Accounts[account.AccountName]=account;
+            }
+            else
+            {
+                account = DatabaseIDS.Accounts[request.Account.AccountName];
+            }
+
+            if (DateTime.Now.Date > account.CurrentDay)
+            {
+                account.CurrentDay = DateTime.Now.Date;
+                account.DailyAmount = 0;
+            }
+
+
+            if (request.Type==RequestType.Payment)
             {
 
-                if( CheckIfRequestsOverload(request.Account))
+                if( CheckIfRequestsOverload(account))
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine("Payment failed.");
                     Console.ForegroundColor = ConsoleColor.White;
+
+                    account.IntervalBeginning = null;
                     return IDSResult.BlockForOverload;
                 }
 
                 if (request.Account.PIN != request.PIN)
                 {
-                    if (request.Account.LoginAttempts == Int32.Parse(ConfigurationManager.AppSettings["wrongPinAttemptsLimit"]) - 1)
+                    if (account.LoginAttempts == Int32.Parse(ConfigurationManager.AppSettings["wrongPinAttemptsLimit"]) - 1)
                     {
                        
                         Console.ForegroundColor = ConsoleColor.Red;
                         Console.WriteLine("Payment failed.");
                         Console.ForegroundColor = ConsoleColor.White;
+
+                        account.LoginAttempts = 0;
                         return IDSResult.BlockForWrongPIN;
                     }
 
-                    request.Account.LoginAttempts++;
+                    account.LoginAttempts++;
                     return IDSResult.FailedPayment;
                 }
                 else
                 {
-                    request.Account.LoginAttempts = 0;
+                    account.LoginAttempts = 0;
                 }
 
                 if (!request.IsOutgoing)
                 {
-                    if ((request.Account.DailyAmount + request.Amount) > Int32.Parse(ConfigurationManager.AppSettings["maxDailyIncomingAmount"]))
+                    if ((account.DailyAmount + request.Amount) > Int32.Parse(ConfigurationManager.AppSettings["maxDailyIncomingAmount"]))
                     {
                         Console.ForegroundColor = ConsoleColor.Red;
                         Console.WriteLine("Raise a loan failed.");
                         Console.ForegroundColor = ConsoleColor.White;
+
+                        account.DailyAmount = 0;
                         return IDSResult.BlockForDailyLimit;
                     }
-                    
+
+                    account.DailyAmount += request.Amount;
                 }
 
                 Console.WriteLine("Payment done!");
@@ -60,31 +86,35 @@ namespace IDS
             }
             else if(request.Type==RequestType.RaiseALoan)
             {
-                if (CheckIfRequestsOverload(request.Account))
+                if (CheckIfRequestsOverload(account))
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine("Raise a loan failed.");
                     Console.ForegroundColor = ConsoleColor.White;
+
+                    account.IntervalBeginning = null;
                     return IDSResult.BlockForOverload;
                 }
 
                 if (request.Account.PIN != request.PIN)
                 {
-                    if (request.Account.LoginAttempts == Int32.Parse(ConfigurationManager.AppSettings["wrongPinAttemptsLimit"]) - 1)
+                    if (account.LoginAttempts == Int32.Parse(ConfigurationManager.AppSettings["wrongPinAttemptsLimit"]) - 1)
                     {
                         Console.ForegroundColor = ConsoleColor.Red;
                         Console.WriteLine("Raise a loan failed.");
                         Console.ForegroundColor = ConsoleColor.White;
+
+                        account.LoginAttempts = 0;
                         return IDSResult.BlockForWrongPIN;
                     }
 
-                    request.Account.LoginAttempts++;
+                    account.LoginAttempts++;
                     Console.WriteLine("Raise a loan failed!");
                     return IDSResult.FailedLoan;
                 }
                 else
                 {
-                    request.Account.LoginAttempts = 0;
+                    account.LoginAttempts = 0;
                     return IDSResult.OK;
                 }
 
@@ -95,15 +125,15 @@ namespace IDS
             return IDSResult.OK;
         }
 
-        public bool CheckIfRequestsOverload(Account account)
+        public bool CheckIfRequestsOverload(AccountIDS account)
         {
             bool retVal = false;
 
             lock (account)
             {
-                if (account.IntevalBeginning == null || account.IntevalBeginning > DateTime.Now.AddSeconds(Int32.Parse(ConfigurationManager.AppSettings["requestsOverloadCheckInterval"])))
+                if (account.IntervalBeginning == null || account.IntervalBeginning > DateTime.Now.AddSeconds(Int32.Parse(ConfigurationManager.AppSettings["requestsOverloadCheckInterval"])))
                 {
-                    account.IntevalBeginning = DateTime.Now;
+                    account.IntervalBeginning = DateTime.Now;
                     account.RequestsCount = 1;
                 }
                 else if (account.RequestsCount + 1 > Int32.Parse(ConfigurationManager.AppSettings["requestsOverloadLimit"]))

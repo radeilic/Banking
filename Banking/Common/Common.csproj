@@ -34,6 +34,7 @@
     <Reference Include="System.Core" />
     <Reference Include="System.IdentityModel" />
     <Reference Include="System.IdentityModel.Selectors" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -44,6 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Account.cs" />
+    <Compile Include="AccountIDS.cs" />
     <Compile Include="Auditing\Audit.cs" />
     <Compile Include="Auditing\AuditEvents.cs" />
     <Compile Include="Auditing\AuditEventsFile.Designer.cs">
@@ -56,6 +58,7 @@
     <Compile Include="Certifications\Formatter.cs" />
     <Compile Include="Certifications\ServiceCertValidator.cs" />
     <Compile Include="Database.cs" />
+    <Compile Include="DatabaseIDS.cs" />
     <Compile Include="IDSResult.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Request.cs" />
