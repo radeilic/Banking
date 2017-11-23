@@ -20,7 +20,7 @@ namespace UserApplication
             binding.Security.Mode = SecurityMode.Transport;
             binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
             X509Certificate2 srvCert = CertManager.GetCertificateFromStorage(StoreName.TrustedPeople, StoreLocation.LocalMachine, srvCertCN);
-            EndpointAddress address = new EndpointAddress(new Uri("net.tcp://localhost:25001/UserServices"),
+            EndpointAddress address = new EndpointAddress(new Uri("net.tcp://10.1.212.111:25001/UserServices"),
                                       new X509CertificateEndpointIdentity(srvCert));
 
             using (UserProxy proxy = new UserProxy(binding, address))
@@ -29,6 +29,7 @@ namespace UserApplication
 
                 do
                 {
+                    Console.WriteLine();
                     Console.WriteLine("================Menu==============");
                     Console.WriteLine("**********************************");
                     Console.WriteLine();
@@ -38,6 +39,7 @@ namespace UserApplication
                     Console.WriteLine("4. Exit");
                     Console.WriteLine();
                     Console.WriteLine("==================================");
+                    Console.WriteLine();
                     odabir = Console.ReadLine();
 
                     string accountName = "";
@@ -48,7 +50,7 @@ namespace UserApplication
                     switch (odabir)
                     {
                         case "1":
-                            Console.WriteLine("Enter account name:");
+                            Console.Write("Enter account name: ");
                             accountName = Console.ReadLine();
                             int res = proxy.OpenAccount(accountName);
                             if (res < 0)
@@ -61,11 +63,11 @@ namespace UserApplication
                             }
                             break;
                         case "2":
-                            Console.WriteLine("Enter account name:");
+                            Console.Write("Enter account name: ");
                             accountName = Console.ReadLine();
-                            Console.WriteLine("Enter PIN:");
+                            Console.Write("Enter PIN: ");
                             pin = Console.ReadLine();
-                            Console.WriteLine("Enter amount:");
+                            Console.Write("Enter amount: ");
                             amount = Console.ReadLine();
 
                             res2 = proxy.RaiseALoan(accountName, Int32.Parse(amount), Int32.Parse(pin));
@@ -79,15 +81,15 @@ namespace UserApplication
                             }
                             break;
                         case "3":
-                            Console.WriteLine("Enter account name:");
+                            Console.Write("Enter account name: ");
                             accountName = Console.ReadLine();
-                            Console.WriteLine("Enter PIN:");
+                            Console.Write("Enter PIN: ");
                             pin = Console.ReadLine();
                             Console.WriteLine("1 - Pay the money");
                             Console.WriteLine("2 - Raise the money");
                             string res3 = Console.ReadLine();
                             bool choise = res3 == "1" ? true : false;
-                            Console.WriteLine("Enter amount:");
+                            Console.Write("Enter amount: ");
                             amount = Console.ReadLine();
 
                             res2 = proxy.Payment(choise, accountName, Int32.Parse(amount),Int32.Parse(pin));
@@ -106,8 +108,6 @@ namespace UserApplication
 
                 } while (odabir!="4");
             }
-            Console.WriteLine("Press any key to close UserApp.");
-            Console.ReadKey(true);
         }
     }
 }
