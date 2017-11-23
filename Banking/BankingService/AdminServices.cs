@@ -24,7 +24,7 @@ namespace BankingService
                     double milliseconds = time.Milliseconds;
                     if (milliseconds > 500)
                     {
-                        Database.loansRequests[i].State = RequestState.REJECTED;
+                        Database.accountsRequests[i].State = RequestState.REJECTED;
                         Database.accountsRequests.RemoveAt(i);
                         i--;
                     }
