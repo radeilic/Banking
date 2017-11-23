@@ -21,6 +21,7 @@ namespace BankingService
                     double milliseconds = time.Milliseconds;
                     if (milliseconds > 500)
                     {
+                        Database.loansRequests[i].State = RequestState.REJECTED;
                         Database.accountsRequests.RemoveAt(i);
                         i--;
                     }
@@ -35,7 +36,8 @@ namespace BankingService
                     double milliseconds = time.Milliseconds;
                     if (milliseconds > 500)
                     {
-                        Database.accountsRequests.RemoveAt(i);
+                        Database.loansRequests[i].State = RequestState.REJECTED;
+                        Database.loansRequests.RemoveAt(i);
                         i--;
                     }
                 }
@@ -49,7 +51,8 @@ namespace BankingService
                     double milliseconds = time.Milliseconds;
                     if (milliseconds > 500)
                     {
-                        Database.accountsRequests.RemoveAt(i);
+                        Database.paymentRequests[i].State = RequestState.REJECTED;
+                        Database.paymentRequests.RemoveAt(i);
                         i--;
                     }
                 }
