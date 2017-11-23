@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace Common
 {
 
-    public class Database
+    public static class Database
     {
         public static object AccountsLock = new object();
         public static object AccountRequestsLock = new object();

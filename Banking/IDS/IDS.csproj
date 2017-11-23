@@ -53,6 +53,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\BankingService\BankingService.csproj">
+      <Project>{dd1390d7-2d93-4178-97d0-6d1fe2b71317}</Project>
+      <Name>BankingService</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Common\Common.csproj">
       <Project>{A8C3C87B-DFDD-46B4-B39E-5F63C152FE6B}</Project>
       <Name>Common</Name>

@@ -58,6 +58,7 @@ namespace IDS
                         return IDSResult.BlockForWrongPIN;
                     }
 
+                    Console.WriteLine("Payment failed.");
                     account.LoginAttempts++;
                     return IDSResult.FailedPayment;
                 }
@@ -71,7 +72,7 @@ namespace IDS
                     if ((account.DailyAmount + request.Amount) > Int32.Parse(ConfigurationManager.AppSettings["maxDailyIncomingAmount"]))
                     {
                         Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine("Raise a loan failed.");
+                        Console.WriteLine("Raise a loan failed. Account blocked");
                         Console.ForegroundColor = ConsoleColor.White;
 
                         account.DailyAmount = 0;
@@ -81,8 +82,17 @@ namespace IDS
                     account.DailyAmount += request.Amount;
                 }
 
-                Console.WriteLine("Payment done!");
-                return IDSResult.OK;
+                        Console.WriteLine("Payment done!");
+                        return IDSResult.OK;
+                    }
+                    else
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine("Payment failed.");
+                        Console.ForegroundColor = ConsoleColor.White;
+                        return IDSResult.FailedPayment;
+                    }
+                }
             }
             else if(request.Type==RequestType.RaiseALoan)
             {
@@ -114,6 +124,7 @@ namespace IDS
                 }
                 else
                 {
+                    Console.WriteLine("Raise a loan succcessful!");
                     account.LoginAttempts = 0;
                     return IDSResult.OK;
                 }
@@ -121,7 +132,7 @@ namespace IDS
 
             }
             
-            Console.WriteLine("Ne treba ovde da dodje!");
+            Console.WriteLine("Payment outgoing done!");
             return IDSResult.OK;
         }
 
@@ -136,12 +147,17 @@ namespace IDS
                     account.IntervalBeginning = DateTime.Now;
                     account.RequestsCount = 1;
                 }
-                else if (account.RequestsCount + 1 > Int32.Parse(ConfigurationManager.AppSettings["requestsOverloadLimit"]))
+                else if (account.RequestsCount + 1 >
+                         Int32.Parse(ConfigurationManager.AppSettings["requestsOverloadLimit"]))
                 {
+                    Console.WriteLine("else if");
                     retVal = true;
                 }
                 else
+                {
+                    Console.WriteLine("else");
                     ++account.RequestsCount;
+                }
             }
 
             return retVal;

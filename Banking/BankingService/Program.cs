@@ -24,7 +24,7 @@ namespace BankingService
         {
             NetTcpBinding binding = new NetTcpBinding();
             EndpointAddress address = new EndpointAddress(new Uri(ConfigurationManager.AppSettings["BankingServiceIDSAddress"]));
-            BankingServiceIDSProxy proxy = new BankingServiceIDSProxy(binding, address);
+            proxy = new BankingServiceIDSProxy(binding, address);
             string srvCertCN = ConfigurationManager.AppSettings["serverCertificationCN"];
 
             NetTcpBinding adminsBinding = new NetTcpBinding();
@@ -204,9 +204,8 @@ namespace BankingService
                                         request.State = RequestState.REJECTED;
                                         Database.PaymentRequests.Remove(request);
 
-                                        Audit.CustomLog.Source = "UserServices.Payment";
-                                        Audit.UserOperationFailed(request.Account.Owner, "Payment", "Insufficient funds");
-                                    }
+                                    Audit.CustomLog.Source = "UserServices.Payment";
+                                    Audit.UserOperationFailed(request.Account.Owner, "Payment", "Insufficient funds");
                                 }
                             }
                         }
@@ -237,7 +236,7 @@ namespace BankingService
                             IDSResult idsResult = proxy.Check(request);
 
                             if (!CheckIDSResult(idsResult, request))
-                                break;
+                                continue;
 
                             lock (Database.AccountsLock)
                             {
