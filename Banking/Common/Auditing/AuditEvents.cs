@@ -13,9 +13,9 @@ namespace Common.Auditing
         UserOperationFailed = 0,
         UserOperationSuccess = 1,
         AdminOperationFailed = 2,
-        AdminOperationSuccess = 4,
-        Admin_User_Authentication_Authorization_Success = 5,
-        Admin_User_Authentication_Authorization_Fail = 6
+        AdminOperationSuccess = 3,
+        AdminUserAuthenticationAuthorizationSuccess = 4,
+        AdminUserAuthenticationAuthorizationFailed = 5
     }
 
     public class AuditEvents
@@ -23,7 +23,7 @@ namespace Common.Auditing
         private static ResourceManager resourceManager = null;
         private static object resourceLock = new object();
 
-        private static ResourceManager ResourceMgr
+        private static ResourceManager ResourceMamager
         {
             get
             {
@@ -33,6 +33,7 @@ namespace Common.Auditing
                     {
                         resourceManager = new ResourceManager(typeof(AuditEventsFile).FullName, Assembly.GetExecutingAssembly());
                     }
+
                     return resourceManager;
                 }
             }
@@ -42,7 +43,7 @@ namespace Common.Auditing
         {
             get
             {
-                return ResourceMgr.GetString(AuditEventTypes.UserOperationFailed.ToString());
+                return ResourceMamager.GetString(AuditEventTypes.UserOperationFailed.ToString());
             }
         }
 
@@ -50,7 +51,7 @@ namespace Common.Auditing
         {
             get
             {
-                return ResourceMgr.GetString(AuditEventTypes.UserOperationSuccess.ToString());
+                return ResourceMamager.GetString(AuditEventTypes.UserOperationSuccess.ToString());
             }
         }
 
@@ -58,7 +59,7 @@ namespace Common.Auditing
         {
             get
             {
-                return ResourceMgr.GetString(AuditEventTypes.AdminOperationFailed.ToString());
+                return ResourceMamager.GetString(AuditEventTypes.AdminOperationFailed.ToString());
             }
         }
 
@@ -66,23 +67,23 @@ namespace Common.Auditing
         {
             get
             {
-                return ResourceMgr.GetString(AuditEventTypes.AdminOperationSuccess.ToString());
+                return ResourceMamager.GetString(AuditEventTypes.AdminOperationSuccess.ToString());
             }
         }
 
-        public static string Admin_User_Authentication_Authorization_Success
+        public static string AdminUserAuthenticationAuthorizationSuccess
         {
             get
             {
-                return ResourceMgr.GetString(AuditEventTypes.Admin_User_Authentication_Authorization_Success.ToString());
+                return ResourceMamager.GetString(AuditEventTypes.AdminUserAuthenticationAuthorizationSuccess.ToString());
             }
         }
 
-        public static string Admin_User_Authentication_Authorization_Fail
+        public static string AdminUserAuthenticationAuthorizationFailed
         {
             get
             {
-                return ResourceMgr.GetString(AuditEventTypes.Admin_User_Authentication_Authorization_Fail.ToString());
+                return ResourceMamager.GetString(AuditEventTypes.AdminUserAuthenticationAuthorizationFailed.ToString());
             }
         }
     }

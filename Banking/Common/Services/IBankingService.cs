@@ -8,13 +8,9 @@ using System.Threading.Tasks;
 namespace Common.Services
 {
     [ServiceContract]
-    public interface IAdminServices
+    public interface IBankingService
     {
         [OperationContract]
-        void Init();
-
-        [OperationContract]
-        void CheckRequest();
-
+        IDSResult Check(Request request);
     }
 }

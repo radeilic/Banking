@@ -10,22 +10,21 @@ namespace Common.Certifications
     {
         public static string ParseName(string winLogonName)
         {
-            string[] parts = new string[] { };
+            string[] parts;
 
             if (winLogonName.Contains("@"))
             {
                 parts = winLogonName.Split('@');
                 return parts[0];
             }
-            else if (winLogonName.Contains("\\"))
+
+            if (winLogonName.Contains("\\"))
             {
                 parts = winLogonName.Split('\\');
                 return parts[1];
             }
-            else
-            {
-                return winLogonName;
-            }
+            
+            return winLogonName;
         }
 
         public static string FormatName(string name)

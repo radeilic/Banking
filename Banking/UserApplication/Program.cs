@@ -1,6 +1,7 @@
 ﻿using Common.Certifications;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.ServiceModel;
@@ -14,18 +15,18 @@ namespace UserApplication
     {
         static void Main(string[] args)
         {
-            string srvCertCN = "BankingService";
+            string srvCertCN = ConfigurationManager.AppSettings["serverCertificationCN"];
 
             NetTcpBinding binding = new NetTcpBinding();
             binding.Security.Mode = SecurityMode.Transport;
             binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
             X509Certificate2 srvCert = CertManager.GetCertificateFromStorage(StoreName.TrustedPeople, StoreLocation.LocalMachine, srvCertCN);
-            EndpointAddress address = new EndpointAddress(new Uri("net.tcp://10.1.212.111:25001/UserServices"),
+            EndpointAddress address = new EndpointAddress(new Uri(ConfigurationManager.AppSettings["userServicesAddress"]),
                                       new X509CertificateEndpointIdentity(srvCert));
 
             using (UserProxy proxy = new UserProxy(binding, address))
             {
-                string odabir;
+                string option;
 
                 do
                 {
@@ -41,27 +42,26 @@ namespace UserApplication
                     Console.WriteLine();
                     Console.WriteLine("==================================");
                     Console.WriteLine();
-                    odabir = Console.ReadLine();
+                    option = Console.ReadLine();
 
                     string accountName = "";
                     string pin = "";
                     string amount = "";
-                    bool res2;
+                    bool result;
+                    int newPIN;
 
-                    switch (odabir)
+                    switch (option)
                     {
                         case "1":
                             Console.Write("Enter account name: ");
                             accountName = Console.ReadLine();
-                            int res = proxy.OpenAccount(accountName);
-                            if (res < 0)
-                            {
+                            newPIN = proxy.OpenAccount(accountName);
+
+                            if (newPIN < 0)
                                 Console.WriteLine("Failed to create account.");
-                            }
                             else
-                            {
-                                Console.WriteLine("Your PIN is: " + res);
-                            }
+                                Console.WriteLine($"Your PIN is: {newPIN}");
+
                             break;
                         case "2":
                             Console.Write("Enter account name: ");
@@ -71,15 +71,20 @@ namespace UserApplication
                             Console.Write("Enter amount: ");
                             amount = Console.ReadLine();
 
-                            res2 = proxy.RaiseALoan(accountName, Int32.Parse(amount), Int32.Parse(pin));
-                            if (res2)
+                            try
                             {
+                                result = proxy.RaiseALoan(accountName, Int32.Parse(amount), Int32.Parse(pin));
+                            }
+                            catch
+                            {
+                                continue;
+                            }
+
+                            if (result)
                                 Console.WriteLine("Loan raised.");
-                            }
                             else
-                            {
                                 Console.WriteLine("Failed to raise a loan.");
-                            }
+
                             break;
                         case "3":
                             Console.Write("Enter account name: ");
@@ -88,37 +93,42 @@ namespace UserApplication
                             pin = Console.ReadLine();
                             Console.WriteLine("1 - Pay the money");
                             Console.WriteLine("2 - Raise the money");
-                            string res3 = Console.ReadLine();
-                            bool choise = res3 == "1" ? true : false;
+                            bool choise = Console.ReadLine() == "1";
                             Console.Write("Enter amount: ");
                             amount = Console.ReadLine();
 
-                            res2 = proxy.Payment(choise, accountName, Int32.Parse(amount),Int32.Parse(pin));
-                            if (res2)
+                            try
                             {
+                                result = proxy.Payment(choise, accountName, Int32.Parse(amount), Int32.Parse(pin));
+                            }
+                            catch
+                            {
+                                continue;
+                            }
+
+                            if (result)
                                 Console.WriteLine("Payment done.");
-                            }
                             else
-                            {
                                 Console.WriteLine("Payment failed.");
-                            }
+
                             break;
                         case "4":
-                            int result = proxy.OpenAccount("Test Account");
+                            Random random = new Random();
+                            string name = $"Test Account {random.Next(1, 100)}";
+                            newPIN = proxy.OpenAccount(name);
 
                             for(int i=0; i < 11; ++i)
                             {
-                                if (proxy.Payment(true, "Test Account", 100, result))
+                                if (proxy.Payment(true, name, 100, newPIN))
                                     Console.WriteLine($"Attempt {i + 1} succeeded");
                                 else
                                     Console.WriteLine($"Attempt {i + 1} failed");
-
                             }
 
                             break;
                     }
 
-                } while (odabir!="5");
+                } while (option!="5");
             }
         }
     }
