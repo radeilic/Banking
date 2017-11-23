@@ -58,7 +58,6 @@ namespace BankingService
             {
                 Console.WriteLine($"Error occurred while trying to open host for admins {e.Message}");
                 Console.WriteLine($"[StackTrace] {e.StackTrace}");
-                adminsSvcHost.Close();
 
                 return;
             }
@@ -94,10 +93,9 @@ namespace BankingService
             }
             catch (Exception e)
             {
-                Console.WriteLine($"Error occurred while trying to open host for admins {e.Message}");
+                Console.WriteLine($"Error occurred while trying to open host for users {e.Message}");
                 Console.WriteLine($"[StackTrace] {e.StackTrace}");
                 adminsSvcHost.Close();
-                usersSvcHost.Close();
 
                 return;
             }
@@ -193,19 +191,9 @@ namespace BankingService
                             {
                                 lock (Database.AccountsLock)
                                 {
-                                    if (request.Account.Amount >= request.Amount)
-                                    {
-                                        request.Account.Amount -= request.Amount;
-                                        request.State = RequestState.PROCCESSED;
-                                        Database.PaymentRequests.Remove(request);
-                                    }
-                                    else
-                                    {
-                                        request.State = RequestState.REJECTED;
-                                        Database.PaymentRequests.Remove(request);
-
-                                    Audit.CustomLog.Source = "UserServices.Payment";
-                                    Audit.UserOperationFailed(request.Account.Owner, "Payment", "Insufficient funds");
+                                    request.Account.Amount -= request.Amount;
+                                    request.State = RequestState.PROCCESSED;
+                                    Database.PaymentRequests.Remove(request);
                                 }
                             }
                         }
@@ -305,7 +293,8 @@ namespace BankingService
                     request.Account.BlockedUntil = DateTime.Now.AddMinutes(Int32.Parse(ConfigurationManager.AppSettings["minutesLockForWrongPin"]));
 
                     request.State = RequestState.REJECTED;
-                    Database.PaymentRequests.Remove(request);
+                    if(!Database.PaymentRequests.Remove(request))
+                        Database.LoanRequests.Remove(request);
 
                     Audit.CustomLog.Source = "UserServices.Payment";
                     Audit.UserOperationFailed(request.Account.Owner, "Payment", "Wrong PIN");
@@ -331,7 +320,8 @@ namespace BankingService
                     break;
                 case IDSResult.Exception:
                     request.State = RequestState.REJECTED;
-                    Database.PaymentRequests.Remove(request);
+                    if(!Database.PaymentRequests.Remove(request))
+                        Database.LoanRequests.Remove(request);
 
                     retVal = false;
                     break;

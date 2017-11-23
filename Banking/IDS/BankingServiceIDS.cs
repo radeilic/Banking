@@ -38,8 +38,7 @@ namespace IDS
                 if( CheckIfRequestsOverload(account))
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("Payment failed.");
-                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.WriteLine($"{DateTime.Now} - {account.AccountName} - Payment failed becaouse of request overload.");
 
                     account.IntervalBeginning = null;
                     return IDSResult.BlockForOverload;
@@ -51,14 +50,14 @@ namespace IDS
                     {
                        
                         Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine("Payment failed.");
-                        Console.ForegroundColor = ConsoleColor.White;
+                        Console.WriteLine($"{DateTime.Now} - {account.AccountName} - Payment failed. Account blocked for wrong PIN.");
 
                         account.LoginAttempts = 0;
                         return IDSResult.BlockForWrongPIN;
                     }
 
-                    Console.WriteLine("Payment failed.");
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine($"{DateTime.Now} - {account.AccountName} - Payment failed because of wrong PIN.");
                     account.LoginAttempts++;
                     return IDSResult.FailedPayment;
                 }
@@ -69,38 +68,39 @@ namespace IDS
 
                 if (!request.IsOutgoing)
                 {
-                    if ((account.DailyAmount + request.Amount) > Int32.Parse(ConfigurationManager.AppSettings["maxDailyIncomingAmount"]))
+                    if (request.Account.Amount < request.Amount)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        Console.WriteLine($"{DateTime.Now} - {account.AccountName} - Payment failed because of insufficient funds.");
+                        return IDSResult.FailedPayment;
+                    }
+                    else if ((account.DailyAmount + request.Amount) > Int32.Parse(ConfigurationManager.AppSettings["maxDailyIncomingAmount"]))
                     {
                         Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine("Raise a loan failed. Account blocked");
-                        Console.ForegroundColor = ConsoleColor.White;
+                        Console.WriteLine($"{DateTime.Now} - {account.AccountName} - Payment failed. Account blocked because of daily limit.");
 
                         account.DailyAmount = 0;
                         return IDSResult.BlockForDailyLimit;
                     }
 
                     account.DailyAmount += request.Amount;
+
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.WriteLine($"{DateTime.Now} - {account.AccountName} - Payment done.");
+                    return IDSResult.OK;
                 }
 
-                        Console.WriteLine("Payment done!");
-                        return IDSResult.OK;
-                    }
-                    else
-                    {
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine("Payment failed.");
-                        Console.ForegroundColor = ConsoleColor.White;
-                        return IDSResult.FailedPayment;
-                    }
-                }
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine($"{DateTime.Now} - {account.AccountName} - Payment done.");
+                return IDSResult.OK;
+
             }
             else if(request.Type==RequestType.RaiseALoan)
             {
                 if (CheckIfRequestsOverload(account))
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("Raise a loan failed.");
-                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.WriteLine($"{DateTime.Now} - {account.AccountName} - Raise a loan failed because of request overload.");
 
                     account.IntervalBeginning = null;
                     return IDSResult.BlockForOverload;
@@ -111,20 +111,22 @@ namespace IDS
                     if (account.LoginAttempts == Int32.Parse(ConfigurationManager.AppSettings["wrongPinAttemptsLimit"]) - 1)
                     {
                         Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine("Raise a loan failed.");
-                        Console.ForegroundColor = ConsoleColor.White;
+                        Console.WriteLine($"{DateTime.Now} - {account.AccountName} - Raise a loan failed. Account blocked for wrong PIN.");
 
                         account.LoginAttempts = 0;
                         return IDSResult.BlockForWrongPIN;
                     }
 
                     account.LoginAttempts++;
-                    Console.WriteLine("Raise a loan failed!");
+
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine($"{DateTime.Now} - {account.AccountName} - Raise a loan failed because of wrong PIN.");
                     return IDSResult.FailedLoan;
                 }
                 else
                 {
-                    Console.WriteLine("Raise a loan succcessful!");
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.WriteLine($"{DateTime.Now} - {account.AccountName} - Raise a loan succcessful!");
                     account.LoginAttempts = 0;
                     return IDSResult.OK;
                 }
@@ -132,7 +134,7 @@ namespace IDS
 
             }
             
-            Console.WriteLine("Payment outgoing done!");
+            Console.WriteLine("Ovde ne treba da dodje");
             return IDSResult.OK;
         }
 
@@ -149,15 +151,9 @@ namespace IDS
                 }
                 else if (account.RequestsCount + 1 >
                          Int32.Parse(ConfigurationManager.AppSettings["requestsOverloadLimit"]))
-                {
-                    Console.WriteLine("else if");
                     retVal = true;
-                }
                 else
-                {
-                    Console.WriteLine("else");
                     ++account.RequestsCount;
-                }
             }
 
             return retVal;

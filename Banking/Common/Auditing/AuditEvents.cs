@@ -13,9 +13,9 @@ namespace Common.Auditing
         UserOperationFailed = 0,
         UserOperationSuccess = 1,
         AdminOperationFailed = 2,
-        AdminOperationSuccess = 4,
-        AdminUserAuthenticationAuthorizationSuccess = 5,
-        AdminUserAuthenticationAuthorizationFailed = 6
+        AdminOperationSuccess = 3,
+        AdminUserAuthenticationAuthorizationSuccess = 4,
+        AdminUserAuthenticationAuthorizationFailed = 5
     }
 
     public class AuditEvents
