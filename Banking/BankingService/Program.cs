@@ -135,12 +135,15 @@ namespace BankingService
                                     Database.AccountRequests.Remove(request);
                                     request.State = RequestState.REJECTED;
                                 }
-                                Random random = new Random();
-                                request.Account.PIN = random.Next(1000, 9999);
-                                Database.Accounts.Add(request.Account.AccountName, request.Account);
-                                Console.WriteLine("Account added.");
-                                Database.AccountRequests.Remove(request);
-                                request.State = RequestState.PROCCESSED;
+                                else
+                                {
+                                    Random random = new Random();
+                                    request.Account.PIN = random.Next(1000, 9999);
+                                    Database.Accounts.Add(request.Account.AccountName, request.Account);
+                                    Console.WriteLine("Account added.");
+                                    Database.AccountRequests.Remove(request);
+                                    request.State = RequestState.PROCCESSED;
+                                }
                             }
                         }
                     }
