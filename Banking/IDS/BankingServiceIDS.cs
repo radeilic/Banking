@@ -40,23 +40,39 @@ namespace IDS
                 }
                 else
                 {
+
                     request.Account.LoginAttempts = 0;
                 }
 
                 if (!request.IsOutgoing)
                 {
-                    if ((request.Account.DailyAmount + request.Amount) > Int32.Parse(ConfigurationManager.AppSettings["maxDailyIncomingAmount"]))
-                    {
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine("Raise a loan failed.");
-                        Console.ForegroundColor = ConsoleColor.White;
-                        return IDSResult.BlockForDailyLimit;
-                    }
-                    
-                }
 
-                Console.WriteLine("Payment done!");
-                return IDSResult.OK;
+                    if (request.Account.Amount >= request.Amount)
+                    {
+                        if ((request.Account.DailyAmount + request.Amount) > Int32.Parse(ConfigurationManager.AppSettings["maxDailyIncomingAmount"]))
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine("Raise a loan failed. Account Blocked.");
+                            Console.ForegroundColor = ConsoleColor.White;
+                            return IDSResult.BlockForDailyLimit;
+                        }
+
+                        request.Account.Amount -= request.Amount;
+                        request.Account.DailyAmount += request.Amount;
+
+                        request.State = RequestState.PROCCESSED;
+                        Console.WriteLine("Payment done!");
+                        return IDSResult.OK;
+                    }
+                    else
+                    {
+                        request.State = RequestState.PROCCESSED;
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine("Payment failed.");
+                        Console.ForegroundColor = ConsoleColor.White;
+                        return IDSResult.FailedPayment;
+                    }
+                }
             }
             else if(request.Type==RequestType.RaiseALoan)
             {
@@ -84,6 +100,7 @@ namespace IDS
                 }
                 else
                 {
+                    Console.WriteLine("Raise a loan succcessful!");
                     request.Account.LoginAttempts = 0;
                     return IDSResult.OK;
                 }

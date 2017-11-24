@@ -1,23 +1,36 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Common
 {
+    [DataContract]
     public class Account
     {
+        [DataMember]
         private string owner;
+        [DataMember]
         private string accountName;
+        [DataMember]
         private int amount;
+        [DataMember]
         private bool isBlocked;
+        [DataMember]
         private DateTime blockedUntil;
+        [DataMember]
         private int dailyAmount;
+        [DataMember]
         private DateTime currentDay;
+        [DataMember]
         private int pin;
+        [DataMember]
         private int loginAttempts;
+        [DataMember]
         private int requestsCount;
+        [DataMember]
         private DateTime? intervalBeginning;
 
         public string  Owner

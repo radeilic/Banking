@@ -24,7 +24,7 @@ namespace BankingService
         {
             NetTcpBinding binding = new NetTcpBinding();
             EndpointAddress address = new EndpointAddress(new Uri(ConfigurationManager.AppSettings["BankingServiceIDSAddress"]));
-            BankingServiceIDSProxy proxy = new BankingServiceIDSProxy(binding, address);
+            proxy = new BankingServiceIDSProxy(binding, address);
             string srvCertCN = ConfigurationManager.AppSettings["serverCertificationCN"];
 
             NetTcpBinding adminsBinding = new NetTcpBinding();
@@ -198,22 +198,13 @@ namespace BankingService
                                         request.Account.CurrentDay = DateTime.Now.Date;
                                         request.Account.DailyAmount = 0;
                                     }
+                                    
 
-                                    if (request.Account.Amount >= request.Amount)
-                                    {
-                                        request.Account.Amount -= request.Amount;
-                                        request.Account.DailyAmount += request.Amount;
-                                        request.State = RequestState.PROCCESSED;
-                                        Database.PaymentRequests.Remove(request);
-                                    }
-                                    else
-                                    {
-                                        request.State = RequestState.REJECTED;
-                                        Database.PaymentRequests.Remove(request);
+                                    request.State = RequestState.REJECTED;
+                                    Database.PaymentRequests.Remove(request);
 
-                                        Audit.CustomLog.Source = "UserServices.Payment";
-                                        Audit.UserOperationFailed(request.Account.Owner, "Payment", "Insufficient funds");
-                                    }
+                                    Audit.CustomLog.Source = "UserServices.Payment";
+                                    Audit.UserOperationFailed(request.Account.Owner, "Payment", "Insufficient funds");
                                 }
                             }
                         }

@@ -1,19 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Common
 {
+    [DataContract]
     public class Request
     {
+        [DataMember]
         private DateTime timeOfCreation;
+        [DataMember]
         private Account account;
+        [DataMember]
         private int pin;
+        [DataMember]
         private RequestState state;
+        [DataMember]
         private int amount;
+        [DataMember]
         private RequestType type;
+        [DataMember]
         private bool isOutgoing;
         
         public DateTime TimeOfCreation
