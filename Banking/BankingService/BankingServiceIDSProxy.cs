@@ -18,11 +18,11 @@ namespace BankingService
             factory = this.CreateChannel();
         }
 
-        public IDSResult Check(Request request)
+        public IDSResult Check(Request request, int pin)
         {
             try
             {
-                return factory.Check(request);
+                return factory.Check(request, pin);
             }
             catch (Exception e)
             {
