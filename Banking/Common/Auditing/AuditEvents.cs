@@ -13,7 +13,9 @@ namespace Common.Auditing
         UserOperationFailed = 0,
         UserOperationSuccess = 1,
         AdminOperationFailed = 2,
-        AdminOperationSuccess = 4
+        AdminOperationSuccess = 4,
+        AdminUserAuthenticationAuthorizationSuccess = 5,
+        AdminUserAuthenticationAuthorizationFailed = 6
     }
 
     public class AuditEvents
@@ -21,7 +23,7 @@ namespace Common.Auditing
         private static ResourceManager resourceManager = null;
         private static object resourceLock = new object();
 
-        private static ResourceManager ResourceMgr
+        private static ResourceManager ResourceMamager
         {
             get
             {
@@ -31,6 +33,7 @@ namespace Common.Auditing
                     {
                         resourceManager = new ResourceManager(typeof(AuditEventsFile).FullName, Assembly.GetExecutingAssembly());
                     }
+
                     return resourceManager;
                 }
             }
@@ -40,7 +43,7 @@ namespace Common.Auditing
         {
             get
             {
-                return ResourceMgr.GetString(AuditEventTypes.UserOperationFailed.ToString());
+                return ResourceMamager.GetString(AuditEventTypes.UserOperationFailed.ToString());
             }
         }
 
@@ -48,7 +51,7 @@ namespace Common.Auditing
         {
             get
             {
-                return ResourceMgr.GetString(AuditEventTypes.UserOperationSuccess.ToString());
+                return ResourceMamager.GetString(AuditEventTypes.UserOperationSuccess.ToString());
             }
         }
 
@@ -56,7 +59,7 @@ namespace Common.Auditing
         {
             get
             {
-                return ResourceMgr.GetString(AuditEventTypes.AdminOperationFailed.ToString());
+                return ResourceMamager.GetString(AuditEventTypes.AdminOperationFailed.ToString());
             }
         }
 
@@ -64,7 +67,23 @@ namespace Common.Auditing
         {
             get
             {
-                return ResourceMgr.GetString(AuditEventTypes.AdminOperationSuccess.ToString());
+                return ResourceMamager.GetString(AuditEventTypes.AdminOperationSuccess.ToString());
+            }
+        }
+
+        public static string AdminUserAuthenticationAuthorizationSuccess
+        {
+            get
+            {
+                return ResourceMamager.GetString(AuditEventTypes.AdminUserAuthenticationAuthorizationSuccess.ToString());
+            }
+        }
+
+        public static string AdminUserAuthenticationAuthorizationFailed
+        {
+            get
+            {
+                return ResourceMamager.GetString(AuditEventTypes.AdminUserAuthenticationAuthorizationFailed.ToString());
             }
         }
     }

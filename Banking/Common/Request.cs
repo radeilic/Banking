@@ -12,7 +12,7 @@ namespace Common
         private Account account;
         private RequestState state;
         private int amount;
-        private bool isPayment;
+        private bool isOutgoing;
 
         public DateTime TimeOfCreation
         {
@@ -20,10 +20,10 @@ namespace Common
             set { timeOfCreation = value; }
         }
 
-        public bool IsPayment
+        public bool IsOutgoing
         {
-            get { return isPayment; }
-            set { isPayment = value; }
+            get { return isOutgoing; }
+            set { isOutgoing = value; }
         }
 
         public Account Account
@@ -53,13 +53,13 @@ namespace Common
             this.Amount = amount;
         }
 
-        public Request(DateTime timeOfCreation, Account account, int amount, bool isPayment)
+        public Request(DateTime timeOfCreation, Account account, int amount, bool isOutgoing)
         {
             this.TimeOfCreation = timeOfCreation;
             this.Account = account;
             this.State = RequestState.WAIT;
             this.Amount = amount;
-            this.IsPayment = isPayment;
+            this.IsOutgoing = isOutgoing;
         }
         
     }
