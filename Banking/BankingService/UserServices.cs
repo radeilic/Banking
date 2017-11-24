@@ -55,7 +55,6 @@ namespace Common
             }
         }
         
-
         public bool Payment(bool isOutgoing, string accountName, int amount, int pin)
         {
             if(Database.Accounts.ContainsKey(accountName))
@@ -135,7 +134,6 @@ namespace Common
 
         }
         
-
         public bool RaiseALoan(string accountName, int amount, int pin)
         {
             if(Database.Accounts.ContainsKey(accountName))
