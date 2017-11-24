@@ -77,7 +77,7 @@ namespace Common
                 DateTime now = DateTime.Now;
 
                 //true is for + payment
-                Request request = new Request(now, account, amount, isOutgoing);
+                Request request = new Request(now, account, pin, amount, isOutgoing);
 
                 lock (Database.PaymentRequestsLock)
                 {
@@ -131,7 +131,7 @@ namespace Common
                 DateTime now = DateTime.Now;
 
                 //true is for + payment
-                Request request = new Request(RequestType.RaiseALoan, now, account, amount);
+                Request request = new Request(RequestType.RaiseALoan, now, account, pin, amount);
 
                 lock (Database.LoanRequestsLock)
                 {

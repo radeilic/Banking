@@ -11,7 +11,7 @@ namespace IDS
 {
     public class BankingServiceIDS : IBankingService
     {
-        public IDSResult Check(Request request, int pin)
+        public IDSResult Check(Request request)
         {
             if(request.Type==RequestType.Payment)
             {
@@ -24,7 +24,7 @@ namespace IDS
                     return IDSResult.BlockForOverload;
                 }
 
-                if (request.Account.PIN != pin)
+                if (request.Account.PIN != request.PIN)
                 {
                     if (request.Account.LoginAttempts == Int32.Parse(ConfigurationManager.AppSettings["wrongPinAttemptsLimit"]) - 1)
                     {
@@ -68,7 +68,7 @@ namespace IDS
                     return IDSResult.BlockForOverload;
                 }
 
-                if (request.Account.PIN != pin)
+                if (request.Account.PIN != request.PIN)
                 {
                     if (request.Account.LoginAttempts == Int32.Parse(ConfigurationManager.AppSettings["wrongPinAttemptsLimit"]) - 1)
                     {
