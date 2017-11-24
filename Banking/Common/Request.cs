@@ -87,6 +87,7 @@ namespace Common
             this.State = RequestState.WAIT;
             this.Amount = amount;
             this.IsOutgoing = isOutgoing;
+
         }
         
     }
