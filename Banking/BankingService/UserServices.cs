@@ -73,32 +73,6 @@ namespace Common
                     return false;
                 }
 
-                if (CheckIfRequestsOverload(account))
-                {
-                    Audit.CustomLog.Source = "UserServices.Payment";
-                    Audit.UserOperationFailed(account.Owner, "Payment", "Server overload");
-                    return false;
-                }
-
-                if (account.PIN != pin)
-                {
-                    if (account.LoginAttempts == Int32.Parse(ConfigurationManager.AppSettings["wrongPinAttemptsLimit"])-1)
-                    {
-                        account.IsBlocked = true;
-                        account.BlockedUntil = DateTime.Now.AddMinutes(Int32.Parse(ConfigurationManager.AppSettings["minutesLockForWrongPin"]));
-
-                        Audit.CustomLog.Source = "UserServices.Payment";
-                        Audit.UserOperationFailed(account.Owner, "Payment", "Account is blocked");
-                        return false;
-                    }
-
-                    account.LoginAttempts++;
-
-                    Audit.CustomLog.Source = "UserServices.Payment";
-                    Audit.UserOperationFailed(account.Owner, "Payment", "Wrong PIN");
-                    return false;
-                }
-
                 account.LoginAttempts = 0;
                 DateTime now = DateTime.Now;
 

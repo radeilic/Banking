@@ -10,7 +10,7 @@ namespace IDS
 {
     public class BankingServiceIDS : IBankingService
     {
-        public bool Check(Request request)
+        public IDSResult Check(Request request)
         {
             throw new NotImplementedException();
         }

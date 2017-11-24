@@ -11,6 +11,6 @@ namespace Common.Services
     public interface IBankingService
     {
         [OperationContract]
-        bool Check(Request request);
+        IDSResult Check(Request request);
     }
 }

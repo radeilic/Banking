@@ -1,9 +1,11 @@
-﻿using System;
+﻿using Common.Services;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
+using Common;
 
 namespace BankingService
 {
@@ -16,16 +18,16 @@ namespace BankingService
             factory = this.CreateChannel();
         }
 
-        
-        public void Check()
+        public IDSResult Check(Request request)
         {
             try
             {
-                factory.Check();
+                return factory.Check(request);
             }
             catch (Exception e)
             {
                 Console.WriteLine($"Exception in Check: {e.Message}");
+                return IDSResult.Exception;
             }
         }
     }
