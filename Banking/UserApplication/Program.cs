@@ -113,11 +113,13 @@ namespace UserApplication
 
                             break;
                         case "4":
-                            newPIN = proxy.OpenAccount("Test Account");
+                            Random random = new Random();
+                            string name = $"Test Account {random.Next(1, 100)}";
+                            newPIN = proxy.OpenAccount(name);
 
                             for(int i=0; i < 11; ++i)
                             {
-                                if (proxy.Payment(true, "Test Account", 100, newPIN))
+                                if (proxy.Payment(true, name, 100, newPIN))
                                     Console.WriteLine($"Attempt {i + 1} succeeded");
                                 else
                                     Console.WriteLine($"Attempt {i + 1} failed");

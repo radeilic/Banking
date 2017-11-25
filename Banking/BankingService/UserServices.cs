@@ -31,7 +31,7 @@ namespace Common
             }
 
             DateTime now = DateTime.Now;
-            Request request = new Request(now, account, 0);
+            Request request = new Request(RequestType.OpenAccount, now, account, 0);
 
             lock (Database.AccountRequestsLock)
             {
@@ -55,7 +55,6 @@ namespace Common
             }
         }
         
-
         public bool Payment(bool isOutgoing, string accountName, int amount, int pin)
         {
             if(Database.Accounts.ContainsKey(accountName))
@@ -74,37 +73,11 @@ namespace Common
                     return false;
                 }
 
-                if (CheckIfRequestsOverload(account))
-                {
-                    Audit.CustomLog.Source = "UserServices.Payment";
-                    Audit.UserOperationFailed(account.Owner, "Payment", "Server overload");
-                    return false;
-                }
-
-                if (account.PIN != pin)
-                {
-                    if (account.LoginAttempts == Int32.Parse(ConfigurationManager.AppSettings["wrongPinAttemptsLimit"])-1)
-                    {
-                        account.IsBlocked = true;
-                        account.BlockedUntil = DateTime.Now.AddMinutes(Int32.Parse(ConfigurationManager.AppSettings["minutesLockForWrongPin"]));
-
-                        Audit.CustomLog.Source = "UserServices.Payment";
-                        Audit.UserOperationFailed(account.Owner, "Payment", "Account is blocked");
-                        return false;
-                    }
-
-                    account.LoginAttempts++;
-
-                    Audit.CustomLog.Source = "UserServices.Payment";
-                    Audit.UserOperationFailed(account.Owner, "Payment", "Wrong PIN");
-                    return false;
-                }
-
-                account.LoginAttempts = 0;
+                
                 DateTime now = DateTime.Now;
 
                 //true is for + payment
-                Request request = new Request(now, account, amount, isOutgoing);
+                Request request = new Request(now, account, pin, amount, isOutgoing);
 
                 lock (Database.PaymentRequestsLock)
                 {
@@ -135,7 +108,6 @@ namespace Common
 
         }
         
-
         public bool RaiseALoan(string accountName, int amount, int pin)
         {
             if(Database.Accounts.ContainsKey(accountName))
@@ -154,37 +126,12 @@ namespace Common
                     return false;
                 }
 
-                if (CheckIfRequestsOverload(account))
-                {
-                    Audit.CustomLog.Source = "UserServices.RaiseALoan";
-                    Audit.UserOperationFailed(account.Owner, "RaiseALoan", "Server overload");
-                    return false;
-                }
+                
 
-                if (account.PIN != pin)
-                {
-                    if(account.LoginAttempts == Int32.Parse(ConfigurationManager.AppSettings["wrongPinAttemptsLimit"])-1)
-                    {
-                        account.IsBlocked = true;
-                        account.BlockedUntil = DateTime.Now.AddMinutes(Int32.Parse(ConfigurationManager.AppSettings["minutesLockForWrongPin"]));
-
-                        Audit.CustomLog.Source = "UserServices.RaiseALoan";
-                        Audit.UserOperationFailed(account.Owner, "Payment", "Account is blocked");
-                        return false;
-                    }
-
-                    account.LoginAttempts++;
-
-                    Audit.CustomLog.Source = "UserServices.RaiseALoan";
-                    Audit.UserOperationFailed(account.Owner, "Payment", "Wrong PIN");
-                    return false;
-                }
-
-                account.LoginAttempts = 0;
                 DateTime now = DateTime.Now;
 
                 //true is for + payment
-                Request request = new Request(now, account, amount);
+                Request request = new Request(RequestType.RaiseALoan, now, account, pin, amount);
 
                 lock (Database.LoanRequestsLock)
                 {
@@ -227,29 +174,6 @@ namespace Common
             }
         }
 
-        public bool CheckIfRequestsOverload(Account account)
-        {
-            bool retVal = false;
-
-            lock (account)
-            {
-                if (account.IntevalBeginning == null || account.IntevalBeginning > DateTime.Now.AddSeconds(Int32.Parse(ConfigurationManager.AppSettings["requestsOverloadCheckInterval"])))
-                {
-                    account.IntevalBeginning = DateTime.Now;
-                    account.RequestsCount = 1;
-                }
-                else if (account.RequestsCount + 1 > Int32.Parse(ConfigurationManager.AppSettings["requestsOverloadLimit"]))
-                {
-                    account.IsBlocked = true;
-                    account.BlockedUntil = DateTime.Now.AddDays(Int32.Parse(ConfigurationManager.AppSettings["daysLockForOverload"]));
-                    account.IntevalBeginning = null;
-                    retVal = true;
-                }
-                else
-                    ++account.RequestsCount;
-            }
-
-            return retVal;
-        }
+        
     }
 }

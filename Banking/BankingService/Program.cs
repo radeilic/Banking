@@ -19,8 +19,12 @@ namespace BankingService
 {
     class Program
     {
+        private static BankingServiceIDSProxy proxy;
         static void Main(string[] args)
         {
+            NetTcpBinding binding = new NetTcpBinding();
+            EndpointAddress address = new EndpointAddress(new Uri(ConfigurationManager.AppSettings["BankingServiceIDSAddress"]));
+            proxy = new BankingServiceIDSProxy(binding, address);
             string srvCertCN = ConfigurationManager.AppSettings["serverCertificationCN"];
 
             NetTcpBinding adminsBinding = new NetTcpBinding();
@@ -54,7 +58,6 @@ namespace BankingService
             {
                 Console.WriteLine($"Error occurred while trying to open host for admins {e.Message}");
                 Console.WriteLine($"[StackTrace] {e.StackTrace}");
-                adminsSvcHost.Close();
 
                 return;
             }
@@ -90,10 +93,9 @@ namespace BankingService
             }
             catch (Exception e)
             {
-                Console.WriteLine($"Error occurred while trying to open host for admins {e.Message}");
+                Console.WriteLine($"Error occurred while trying to open host for users {e.Message}");
                 Console.WriteLine($"[StackTrace] {e.StackTrace}");
                 adminsSvcHost.Close();
-                usersSvcHost.Close();
 
                 return;
             }
@@ -135,12 +137,15 @@ namespace BankingService
                                     Database.AccountRequests.Remove(request);
                                     request.State = RequestState.REJECTED;
                                 }
-                                Random random = new Random();
-                                request.Account.PIN = random.Next(1000, 9999);
-                                Database.Accounts.Add(request.Account.AccountName, request.Account);
-                                Console.WriteLine("Account added.");
-                                Database.AccountRequests.Remove(request);
-                                request.State = RequestState.PROCCESSED;
+                                else
+                                {
+                                    Random random = new Random();
+                                    request.Account.PIN = random.Next(1000, 9999);
+                                    Database.Accounts.Add(request.Account.AccountName, request.Account);
+                                    Console.WriteLine("Account added.");
+                                    Database.AccountRequests.Remove(request);
+                                    request.State = RequestState.PROCCESSED;
+                                }
                             }
                         }
                     }
@@ -168,7 +173,10 @@ namespace BankingService
                         if (Database.PaymentRequests.Count > 0)
                         {
                             Request request = Database.PaymentRequests[Database.PaymentRequests.Count - 1];
+                            IDSResult idsResult = proxy.Check(request);
 
+                            if (!CheckIDSResult(idsResult, request))
+                                continue;
 
                             if (request.IsOutgoing)
                             {
@@ -183,39 +191,9 @@ namespace BankingService
                             {
                                 lock (Database.AccountsLock)
                                 {
-                                    if (DateTime.Now.Date > request.Account.CurrentDay)
-                                    {
-                                        request.Account.CurrentDay = DateTime.Now.Date;
-                                        request.Account.DailyAmount = 0;
-                                    }
-                                    else if ((request.Account.DailyAmount + request.Amount) > Int32.Parse(ConfigurationManager.AppSettings["maxDailyIncomingAmount"]))
-                                    {
-                                        request.Account.IsBlocked = true;
-                                        request.Account.BlockedUntil = DateTime.Now.AddDays(1);
-
-                                        request.State = RequestState.REJECTED;
-                                        Database.PaymentRequests.Remove(request);
-
-                                        Audit.CustomLog.Source = "UserServices.Payment";
-                                        Audit.UserOperationFailed(request.Account.Owner, "Payment", "Daily limit reached");
-                                        continue;
-                                    }
-
-                                    if (request.Account.Amount >= request.Amount)
-                                    {
-                                        request.Account.Amount -= request.Amount;
-                                        request.Account.DailyAmount += request.Amount;
-                                        request.State = RequestState.PROCCESSED;
-                                        Database.PaymentRequests.Remove(request);
-                                    }
-                                    else
-                                    {
-                                        request.State = RequestState.REJECTED;
-                                        Database.PaymentRequests.Remove(request);
-
-                                        Audit.CustomLog.Source = "UserServices.Payment";
-                                        Audit.UserOperationFailed(request.Account.Owner, "Payment", "Insufficient funds");
-                                    }
+                                    request.Account.Amount -= request.Amount;
+                                    request.State = RequestState.PROCCESSED;
+                                    Database.PaymentRequests.Remove(request);
                                 }
                             }
                         }
@@ -243,6 +221,10 @@ namespace BankingService
                         if (Database.LoanRequests.Count > 0)
                         {
                             Request request = Database.LoanRequests[Database.LoanRequests.Count - 1];
+                            IDSResult idsResult = proxy.Check(request);
+
+                            if (!CheckIDSResult(idsResult, request))
+                                continue;
 
                             lock (Database.AccountsLock)
                             {
@@ -274,6 +256,81 @@ namespace BankingService
                     Thread.Sleep(500);
                 }
             }
+        }
+
+        static private bool CheckIDSResult(IDSResult idsResult, Request request)
+        {
+            bool retVal = false;
+
+            switch (idsResult)
+            {
+                case IDSResult.BlockForDailyLimit:
+                    request.Account.IsBlocked = true;
+                    request.Account.BlockedUntil = DateTime.Now.AddDays(Int32.Parse(ConfigurationManager.AppSettings["daysLockForLimitViolation"]));
+
+                    request.State = RequestState.REJECTED;
+                    Database.PaymentRequests.Remove(request);
+
+                    Audit.CustomLog.Source = " UserServices.Payment";
+                    Audit.UserOperationFailed(request.Account.Owner, "Payment", "Daily limit reached");
+
+                    retVal = false;
+                    break;
+                case IDSResult.BlockForOverload:
+                    request.Account.IsBlocked = true;
+                    request.Account.BlockedUntil = DateTime.Now.AddDays(Int32.Parse(ConfigurationManager.AppSettings["daysLockForOverload"]));
+
+                    request.State = RequestState.REJECTED;
+                    Database.PaymentRequests.Remove(request);
+
+                    Audit.CustomLog.Source = " UserServices.Payment";
+                    Audit.UserOperationFailed(request.Account.Owner, "Payment", "Server overload");
+
+                    retVal = false;
+                    break;
+                case IDSResult.BlockForWrongPIN:
+                    request.Account.IsBlocked = true;
+                    request.Account.BlockedUntil = DateTime.Now.AddMinutes(Int32.Parse(ConfigurationManager.AppSettings["minutesLockForWrongPin"]));
+
+                    request.State = RequestState.REJECTED;
+                    if(!Database.PaymentRequests.Remove(request))
+                        Database.LoanRequests.Remove(request);
+
+                    Audit.CustomLog.Source = "UserServices.Payment";
+                    Audit.UserOperationFailed(request.Account.Owner, "Payment", "Wrong PIN");
+                    retVal = false;
+                    break;
+                case IDSResult.FailedPayment:
+                    request.State = RequestState.REJECTED;
+                    Database.PaymentRequests.Remove(request);
+
+                    Audit.CustomLog.Source = "UserServices.Payment";
+                    Audit.UserOperationFailed(request.Account.Owner, "Payment", "Wrong PIN");
+
+                    retVal = false;
+                    break;
+                case IDSResult.FailedLoan:
+                    request.State = RequestState.REJECTED;
+                    Database.LoanRequests.Remove(request);
+
+                    Audit.CustomLog.Source = "UserServices.RaiseALoan";
+                    Audit.UserOperationFailed(request.Account.Owner, "RaiseALoan", "Wrong PIN");
+
+                    retVal = false;
+                    break;
+                case IDSResult.Exception:
+                    request.State = RequestState.REJECTED;
+                    if(!Database.PaymentRequests.Remove(request))
+                        Database.LoanRequests.Remove(request);
+
+                    retVal = false;
+                    break;
+                case IDSResult.OK:
+                    retVal = true;
+                    break;
+            }
+
+            return retVal;
         }
     }
 }

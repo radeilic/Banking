@@ -1,91 +1,59 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Common
 {
+    [DataContract]
     public class Account
     {
+        [DataMember]
         private string owner;
+        [DataMember]
         private string accountName;
+        [DataMember]
         private int amount;
+        [DataMember]
         private bool isBlocked;
+        [DataMember]
         private DateTime blockedUntil;
-        private int dailyAmount;
-        private DateTime currentDay;
+        [DataMember]
         private int pin;
-        private int loginAttempts;
-        private int requestsCount;
-        private DateTime? intervalBeginning;
 
         public string  Owner
         {
             get { return owner; }
             set { owner = value; }
         }
-
         public int PIN
         {
             get { return pin; }
             set { pin = value; }
         }
-
         public string AccountName
         {
             get { return accountName; }
             set { accountName = value; }
         }
-
         public int Amount
         {
             get { return amount; }
             set { amount = value; }
         }
-
         public bool IsBlocked
         {
             get { return isBlocked; }
             set { isBlocked = value; }
         }
-
         public DateTime BlockedUntil
         {
             get { return blockedUntil; }
             set { blockedUntil = value; }
         }
-
-        public int DailyAmount
-        {
-            get { return dailyAmount; }
-            set { dailyAmount = value; }
-        }
-
-        public DateTime CurrentDay
-        {
-            get { return currentDay; }
-            set { currentDay = value; }
-        }
-
-        public int LoginAttempts
-        {
-            get { return loginAttempts; }
-            set { loginAttempts = value; }
-        }
-        
-        public int RequestsCount
-        {
-            get { return requestsCount; }
-            set { requestsCount = value; }
-        }
-
-        public DateTime? IntevalBeginning
-        {
-            get { return intervalBeginning; }
-            set { intervalBeginning = value; }
-        }
-
 
         public Account(string owner, string accountName)
         {
@@ -93,10 +61,6 @@ namespace Common
             this.AccountName = accountName;
             this.Amount = 0;
             this.IsBlocked = false;
-            this.dailyAmount = 0;
-            this.CurrentDay = DateTime.Now.Date;
-            this.LoginAttempts = 0;
-            this.RequestsCount = 0;
         }
     }
 }
