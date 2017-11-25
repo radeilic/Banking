@@ -130,11 +130,8 @@ namespace IDS
                     account.LoginAttempts = 0;
                     return IDSResult.OK;
                 }
-
-
             }
             
-            Console.WriteLine("Ovde ne treba da dodje");
             return IDSResult.OK;
         }
 
